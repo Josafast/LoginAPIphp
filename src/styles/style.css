@@ -1,0 +1,536 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&family=Roboto:wght@300&family=Ubuntu&display=swap');
+
+* {
+	font-family: 'Open sans',sans-serif;
+	font-weight: 100;
+	box-sizing: border-box;
+}
+
+:root {
+	--clr: #00a2ff;
+	--clr1: #f9468c;
+}
+
+body {
+	overflow: hidden;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	background-color: var(--clr);
+	transition: 0.5s;
+	letter-spacing:0.05em;
+}
+
+footer {
+	flex-flow: row;
+	display: flex;
+	align-items: center;
+	padding: 0 20px;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 80px;
+	margin: 0;
+	justify-content: center;
+}
+
+footer a {
+	filter: invert(100%);
+	display: flex;
+}
+
+footer a[href="https://github.com/Josafast"]{
+	margin-right: auto;
+	width: 50px;
+	height: 50px;
+}
+
+footer a[href="https://github.com/Josafast?tab=repositories"]{
+	margin-left: auto;
+	width: 35px;
+	height: 35px;
+}
+
+footer a[href="https://github.com/Josafast?tab=repositories"]:hover{
+	filter: invert(100%) sepia(77%) saturate(5543%) hue-rotate(172deg) brightness(99%) contrast(82%);
+}
+
+body.active footer a[href="https://github.com/Josafast?tab=repositories"]:hover{
+	filter: invert(90%) sepia(60%) saturate(339%) hue-rotate(287deg) brightness(96%) contrast(83%);
+}
+
+footer p {
+	color: #fff;
+	text-align: center;
+	max-width: 360px;
+}
+
+button {
+	border: none;
+	padding: 11px 15px;
+	cursor: pointer;
+	letter-spacing: 0.05em;
+	font-weight: bold;
+	user-select: none;
+}
+
+.box {
+	position:relative;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.3);
+	width: 650px;
+	height: 350px;
+	box-shadow: 0px 0px 73px -15px rgba(0,0,0,0.26);
+	transition: 0.5s;
+	flex-shrink: 0;
+}
+
+.box .log, .sign {
+	position: relative;
+	display: flex; 
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin:auto;
+}
+
+.box .log h1, .sign h1 {
+	color: #fff;
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.box .log button, .sign button {
+	color: #000;
+	background-color: #fff;
+}
+
+.box .type {
+	position: absolute;
+	left: 0%;
+	width: 50%;
+	box-shadow: 0px 0px 73px -15px rgba(0,0,0,0.26);
+	height: 420px;
+	background-color: #fff;
+	transition: 0.5s;
+	overflow: hidden;
+}
+
+.box .type form {
+	display: flex;
+	flex-direction: column;
+	transition: 0.5s;
+}
+
+.box .type .loger {
+	top: 60px;
+	left: 30px;
+	position: absolute;
+}
+
+.box .type .signer {
+	position: absolute;
+	top: 35px;
+	left: 420px;
+}
+
+.box .type .pregunta {
+	width: 100%;
+	background-color: #fff;
+	padding: 20px;
+	position: absolute;
+	top: 0;
+	left: 330px;
+}
+
+.box .type .pregunta .back-register {
+	left: 0px;
+	position: absolute;
+	color: var(--clr1);
+	font-size: 1.4em;
+	cursor: pointer;
+}
+
+.box .type .pregunta.active {
+	transform: translateX(-310px);
+}
+
+.box .type .pregunta h2 {
+	font-size: 1.2em;
+	margin-bottom: 20px;
+}
+
+.box .type .pregunta .preguntas {
+	font-size: 1.1em;
+  width: min-content;
+  margin-left: -10px;
+  border: none;
+  outline: none;
+}
+
+.box .type .pregunta input[type="submit"] {
+	margin-top: 20px;
+	color: #fff;
+	outline: none;
+	border: none;
+	width: 120px;
+	height: 41px;
+	background-color: var(--clr1);
+}
+
+.body.active .box .type .signer {
+	transform: translateX(-390px);
+}
+
+.box .type .signer button {
+	width: 120px;
+	height: 41px;
+	background-color: var(--clr1);
+}
+
+.body.active .box .type .loger {
+	transform: translateX(-420px);
+}
+
+.box .type form input {
+	position: relative;
+	padding: 10px 13px;
+	border: 2px solid #bfbfbf;
+	color: gray;
+	margin:7px 0;
+}
+
+.box .type form input:focus {
+	outline: none;
+}
+
+.box .type form h2 {
+	font-size: 2em;
+	margin-bottom: 20px;
+}
+
+.box .type form a {
+	margin: 20px 0;
+	letter-spacing: 0;
+	color: #606060;
+}
+
+.box .type form button {
+	font-weight: normal;
+	color: #fff;
+	box-shadow: 0px 0px 73px -15px rgba(0,0,0,0.26);
+	margin-top: 15px;
+}
+
+.box .type .loger button {
+	width: 110px;
+	height: 41px;
+	background-color: var(--clr);	
+}
+
+.body.active .box .type {
+	transform: translateX(100%);
+}
+
+.body.active {
+	background-color: var(--clr1);
+}
+
+.passwords span {
+	cursor: pointer;
+	color: lightgray;
+	font-size: 1.6em;
+	position: absolute;
+	margin: 15px 0 0 10px;
+}
+
+.message {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.2em;
+	padding: 0 20px;
+	opacity: 0;
+	flex-direction: row;
+	position: fixed;
+	bottom: 30px;
+	left: 0;
+	transition: 0.5s;
+	min-width: 150px;
+	height: 80px;
+	border: none;
+	background-color: #fff;
+	box-shadow: 0 5px 50px rgba(0,0,0,0.2);
+}
+
+.message span {
+	font-size: 1.4em;
+	margin: 0 15px 0 0;
+}
+
+.message span.delete, span.no {
+	color: #bf0000;
+}
+
+.message span.add {
+	color: #00bf00;
+}
+
+.message span.edit {
+	color: #df9000;
+	font-size: 1.6em;
+}
+
+@keyframes mensaje1 {
+	0% {
+		opacity: 0;
+	} 100% {
+		left: 30px;
+		opacity: 1;
+		z-index: 5;
+	}
+}
+
+@keyframes mensaje2 {
+	0% {
+		left: 30px;
+		opacity: 1;
+	} 100% {
+		left: 0;
+		opacity: 0;
+		z-index: -1;
+	}
+}
+
+@media screen and (max-width:700px) {
+	.box {
+		flex-direction: column;
+		width: 450px;
+		height: 500px;
+		justify-content: space-between;
+		padding: 5px 0 20px;
+	}
+
+	.box .log, .sign {
+		margin: 0;
+	}
+
+	.box .type {
+		width: 120%;
+		top:-5%;
+		left:-10%;
+	}
+
+	.body .type::before {
+		content: '';
+		position: absolute;
+		width:30px;
+		height:30px;
+		top:50%;
+		left:8%;
+		background-color: var(--clr);
+		border-radius:50%;
+		transition: 0.5s;
+	}
+
+	.body .type::after {
+		content: '';
+		position: absolute;
+		width:30px;
+		height:30px;
+		top:50%;
+		left:85%;
+		background-color: var(--clr);
+		border-radius:50%;
+		transition: 0.5s;
+	}
+
+	.body.active .box .type::before, .body.active .box .type::after {
+		background-color: var(--clr1);
+	}
+
+	.body.active .box .type {
+		transform: translateY(135px);
+	}
+
+	.box .type .loger {
+		left:30%;
+	}
+
+	.box .type .signer {
+		left:30%;
+		top:120%;
+	}
+
+	.body.active .box .type .loger {
+		transform: translateY(-150%);
+	}
+
+	.body.active .box .type .signer {
+		transform: translateY(-139%);
+	}
+}
+
+@media screen and (max-width:580px){
+	.message {
+		width: 80vw;
+	}
+
+	.help {
+		z-index: 2;
+		cursor: pointer;
+		filter: invert(100%);
+		position: fixed;
+		width: 40px;
+		height: 40px;
+		bottom: 20px;
+		left: calc(50% - 20px);
+	}
+	
+	footer {
+		display: none;
+	}
+
+	footer .close {
+		cursor: pointer;
+		width: 40px;
+		height: 40px;
+		position: absolute;
+		right: 20px;
+		top: 20px;
+		filter: invert(40%) sepia(54%) saturate(2273%) hue-rotate(165deg) brightness(100%) contrast(101%);
+	}
+
+	body.active footer .close {
+		filter: invert(47%) sepia(85%) saturate(3820%) hue-rotate(313deg) brightness(102%) contrast(95%);
+	}
+
+	footer.active {
+		z-index: 3;
+		background-color: rgba(255, 255, 255, 0.9);
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-flow: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	body footer p {
+		color: var(--clr) !important;
+	}
+
+	body footer a {
+		filter: invert(40%) sepia(54%) saturate(2273%) hue-rotate(165deg) brightness(100%) contrast(101%);
+	}
+
+	body.active footer p {
+		color: var(--clr1) !important;
+	}
+
+	body.active footer a {
+		filter: invert(47%) sepia(85%) saturate(3820%) hue-rotate(313deg) brightness(102%) contrast(95%);
+	}
+
+	footer a[href="https://github.com/Josafast"]{
+		width: 70px;
+		height: 70px;
+		margin: 10px 0;
+	}
+
+	footer a[href="https://github.com/Josafast?tab=repositories"]{
+		position: absolute;
+		bottom: 20px;
+		left: 20px; 
+	}
+
+	.box {
+		width: 350px;
+	}
+
+	.box .type form button {
+		margin-top: 10px;
+	}
+
+	.box .type form a {
+		margin:15px 0;
+	}
+
+	.box .type .loger {
+		top: 20%;
+		left: 25%;
+	}
+
+	.box .type .signer {
+		top: 115%;
+		left: 25%;
+	}
+
+	.passwords span {
+		margin: 15px;
+	}
+
+	.box .type form h2 {
+		font-size: 1.7em;
+		margin-bottom: 10px;
+	}
+
+	.box .type form a {
+		font-size:0.9em;
+	}
+
+	.box .type form input {
+		font-size: 0.8em;
+	}
+
+	.box .type form button {
+		font-size: 0.8em;
+	}
+
+	.box .type .loger button {
+		width: 90px;
+		height: 38px;
+	}
+
+	.box .type .signer button {
+		width: 100px;
+		height: 38px;
+	}
+}
+
+@media screen and (max-width: 440px){
+	.box {
+		width: 270px;
+	}
+
+	.box .type .loger, .box .type .signer {
+		left:20%;
+	}
+
+	.box .type::before, .type::after {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 350px){
+	.box {
+		width: 230px;
+	}
+
+	.box .type {
+		width: 100%;
+		left: 0;
+	}
+
+	.box .type .loger, .box .type .signer {
+		left: 10%;
+	}
+
+	.passwords span {
+		margin: 14px 0 0 -35px;
+	}
+}
