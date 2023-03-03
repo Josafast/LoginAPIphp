@@ -1,5 +1,13 @@
-window.addEventListener("load",()=>{
+fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
+  .then(res=>res.json())
+  .then(res=>{
+    document.querySelector('.emailPHP').textContent = res.login_email;
+    document.querySelectorAll(".nombrePHP").forEach(element=>{
+      element.textContent = res.login_user
+    });
+  });
 
+window.addEventListener("load",()=>{
   if (history.state){
 		mensaje(history.state.mode,history.state.mensaje);
 		history.replaceState(null,'','');

@@ -18,7 +18,15 @@
         }
 
         if (password_verify($values[':pass'],$user['login_password'])){
-          return $user;
+          $token = parent::jwt($user['id'],$user['login_email']);
+          $data = array(":token"=>$token[0],":token_exp"=>$token[1]);
+
+          $result2 = $this->dbconex->prepare("UPDATE login_users SET login_token=:token, login_token_exp=:token_exp WHERE login_email=:email");
+          $result2->execute(array(":email"=>$values[':email'],":token"=>$data[':token'],":token_exp"=>$data[':token_exp']));
+
+          if ($result2->rowCount() == 1){
+            return array("mode"=>"ok","mensaje"=>$token);
+          }
         } else {
           return array("mensaje"=>"La contraseña es incorrecta, inténtalo de nuevo","mode"=>"no");
         }

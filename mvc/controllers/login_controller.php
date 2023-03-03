@@ -13,13 +13,11 @@
 
       $loger = $login->enter($formValues);
 
-      if (array_key_exists("login_password",$loger)){
-        $loger['login_password'] = $formValues[':pass'];
-        session_start();
-        $_SESSION['user'] = $loger['login_user'];
-        $_SESSION['email'] = $loger['login_email'];
-        echo json_encode(array("mode"=>"ok","mensaje"=>"Se ha iniciado sesión"));
-      } else echo json_encode($loger);
+      if ($loger['mode'] == "ok"){
+        setcookie("user",$loger['mensaje'][0],$loger['mensaje'][1],"/");
+      } 
+
+      echo json_encode($loger['mensaje']);
     } else {
 
       $formValues = array(

@@ -65,4 +65,10 @@
     echo json_encode($users);
   }
 
+  if (isset($_GET['userInfo'])){
+    $user = $loged->userInfo();
+
+    echo json_encode($user);
+  }
+
 ?>

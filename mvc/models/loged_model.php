@@ -9,6 +9,19 @@
       parent::__construct();
     }
 
+    public function userInfo(){
+      $email = parent::jwt_decode($_COOKIE['user']);
+      
+      $result = $this->dbconex->query("SELECT * FROM login_users WHERE login_email='" . $email->data->email . "'",PDO::FETCH_ASSOC);
+
+      $result2;
+      foreach($result as $value){
+        $result2[] = $value;
+      }
+
+      return $result2[0];
+    }
+
     public function update_password($values){
       $result = $this->dbconex->query("SELECT login_password FROM login_users WHERE login_email='" . $values[':email'] . "'",PDO::FETCH_OBJ);
 

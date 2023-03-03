@@ -8,7 +8,6 @@
 	<link rel="stylesheet" href="src/styles/normalize.css">
 	<link rel="stylesheet" href="src/styles/style.css">
 	<title>Sign up or Log in</title>
-	<?php session_start(); ?>
 </head>
 <body class="body">
 
@@ -16,7 +15,7 @@
 		<img src="img/help.svg" alt="help">
 	</span>
 	<div class="message"></div>
-	<?php if(!isset($_SESSION['user'])):?>
+	<?php if(!isset($_COOKIE['user'])):?>
 
 	<div class="box">
 		<div class="log">

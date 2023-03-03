@@ -1,7 +1,7 @@
 <?php 
 
   if(isset($_POST['volver'])){
-    session_destroy();
+    setcookie("user","",time()-1);
     header("location:index.php");
   }
 
@@ -12,7 +12,7 @@
 <div class="box">
   <div class="pages">
     <div class="info" style="color: #fff">
-      <h2>Hola <?php echo $_SESSION['user']?>!</h2>
+      <h2>Hola <b class="nombrePHP"></b>!</h2>
       <h3 class="menu">Menú:</h3>
         <ul style="margin: 0 40px auto;">
           <li class="menu-option" id="profile" style="border-radius:5px 5px 0 0;">Ver perfil</li>
@@ -113,8 +113,8 @@
       <div class="chossen-img">
         <input type="file" accept="image/*">
       </div>
-      <h1>Josafat</h1>
-      <h3>Correo: &nbsp;&nbsp;&nbsp;<?php echo $_SESSION['email']?></h3>
+      <h1><b class="nombrePHP"></b></h1>
+      <h3>Correo: &nbsp;&nbsp;&nbsp;<b class="emailPHP"></b></h3>
     </div>
     <div class="screen other-profile" style="padding: 20px 20px;">
       <span class="profile-img"></span>
