@@ -13,6 +13,18 @@ window.addEventListener("load",()=>{
 		history.replaceState(null,'','');
 	}
 
+  document.querySelector('.back').addEventListener('submit',e=>{
+    e.preventDefault();
+
+    fetch('./mvc/controllers/loged_controller.php?back=true',{method:"GET"})
+      .then(res=>res.json())
+      .then(res=>{
+        if (res.mode == "ok"){
+          location.reload();
+        }
+      })
+  });
+
   document.querySelectorAll('.menu-option').forEach(element=>{
     element.addEventListener("click",(e)=>{
       document.querySelectorAll('.screen').forEach(scrEEn=>{

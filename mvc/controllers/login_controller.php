@@ -15,11 +15,10 @@
 
       if ($loger['mode'] == "ok"){
         setcookie("user",$loger['mensaje'][0],$loger['mensaje'][1],"/");
-      } 
+      }
 
-      echo json_encode($loger['mensaje']);
+      echo json_encode($loger);
     } else {
-
       $formValues = array(
         ":user"=>htmlentities(addslashes(trim($_POST['sign-user']))),
         ":email"=>htmlentities(addslashes(trim($_POST['sign-email']))),
@@ -36,16 +35,11 @@
     }
   }
 
-  if (isset($_POST['recuperar'])){
-    echo json_encode($login->encounter(htmlentities(addslashes(trim($_POST['recuperar'])))));
-  }
-
   if (isset($_POST['consultar-recuperacion'])){
-    echo json_encode($login->ask_question(array(
+    echo json_encode($login->ask_question(htmlentities(addslashes(trim($_POST['consultar-recuperacion']))),array(
       htmlentities(addslashes(trim($_POST['response1']))),
       htmlentities(addslashes(trim($_POST['response2']))),
       htmlentities(addslashes(trim($_POST['response3']))),
-      $_POST['consultar-recuperacion']
     )));
   }
 

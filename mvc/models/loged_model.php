@@ -1,6 +1,9 @@
 <?php
 
   error_reporting(E_ERROR | E_PARSE);
+  require_once '..\..\vendor\autoload.php';
+  use Firebase\JWT\JWT;
+  use Firebase\JWT\Key;
 
   require('conect.php');
 
@@ -9,99 +12,62 @@
       parent::__construct();
     }
 
-    public function userInfo(){
-      $email = parent::jwt_decode($_COOKIE['user']);
-      
-      $result = $this->dbconex->query("SELECT * FROM login_users WHERE login_email='" . $email->data->email . "'",PDO::FETCH_ASSOC);
-
-      $result2;
-      foreach($result as $value){
-        $result2[] = $value;
+    public function selectUser($email=""){
+      if ($email == ""){
+        $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
+        $email = $token->data->email;
       }
-
-      return $result2[0];
+      $user = parent::selectUser($email);
+      return $user;
     }
 
-    public function update_password($values){
-      $result = $this->dbconex->query("SELECT login_password FROM login_users WHERE login_email='" . $values[':email'] . "'",PDO::FETCH_OBJ);
+    public function updatePassword($values){
+      $user = self::selectUser();
+      $email = $user['login_email'];
+      $query = $this->dbconex->prepare("UPDATE login_users SET login_password=:change WHERE login_email=:email");
+      $query->execute(array(":change"=>$values[':new-pass'],":email"=>$email));
 
-      foreach($result as $person){
-        $result = $person;
-      }
-
-      if (password_verify($values[':old-pass'],$result->login_password)){
-        $result = $this->dbconex->prepare("UPDATE login_users SET login_password=:newPass WHERE login_email=:email");
-        $result->execute(array(":newPass"=>$values[':new-pass'],":email"=>$values[':email']));
-
-        if ($result->rowCount() == 1){
-          return array("mode"=>"updated","mensaje"=>"La contraseña ha sido actualizada");
-        } else return array("mode"=>"no","mensaje"=>"No se pudo cambiar la contraseña");
-      } else return array("mode"=>"no","mensaje"=>"La contraseña no es la correcta");
+      if ($query->rowCount() == 1){
+        return array("mode"=>"updated","mensaje"=>"La contraseña ha sido actualizada");
+      } else return array("mode"=>"no","mensaje"=>"No se pudo cambiar la contraseña");
     }
 
-    public function update_password_two($values){
-      $result = $this->dbconex->prepare("UPDATE login_users SET login_password=:pass WHERE login_email=:email");
-      $result->execute($values);
+    public function remove_account($password){
+      $user = self::selectUser();
 
-      if ($result->rowCount() == 1){
-        return array("mode"=>"ok-changed","mensaje"=>"Contraseña cambiada");
-      } else return array("mode"=>"no","mensaje"=>"No se pudo actualizar la contraseña");
-    }
+      if (password_verify($password,$user['login_password'])){
+        $query = $this->dbconex->exec("DELETE FROM login_users WHERE login_email='" . $user['login_email'] . "'");
 
-    public function remove_account($values){
-      $result = $this->dbconex->query("SELECT login_password FROM login_users WHERE login_email='" . $values[':email'] . "'",PDO::FETCH_OBJ);
-
-      foreach($result as $person){
-        $result = $person;
-      }
-
-      if (password_verify($values[':pass'],$result->login_password)){
-        $result = $this->dbconex->exec("DELETE FROM login_users WHERE login_email='" . $values[':email'] . "'");
-
-        if ($result == 1){
+        if ($query == 1){
+          setcookie('user',"",time()-1,"/");
           return array("mode"=>"removed","mensaje"=>"Se ha borrado la cuenta");
         } else return array("mode"=>"no","mensaje"=>"No se ha podido borrar la cuenta");
       } else return array("mode"=>"no","mensaje"=>"La contraseña no es la correcta");
     }
 
     public function update_asks($values){
-      $result = $this->dbconex->prepare("SELECT * FROM login_questions WHERE id=? OR id=? OR id=?");
-      $result->execute(array($values[':asks'][0],$values[':asks'][1],$values[':asks'][2]));
+      $asksQuery = parent::selectAsks(array($values[':asks'],$values[':responses']));
+      $userQuery = self::selectUser();
+      $query = $this->dbconex->prepare("UPDATE login_users SET login_ask=:asks WHERE login_email=:email");
+      $query->execute(array(":email"=>$userQuery['login_email'],"asks"=>json_encode($asksQuery)));
 
-      if ($result->rowCount() >= 1){
-        $result2;
-        while ($fila = $result->fetch(PDO::FETCH_ASSOC)){
-          $result2["" . $fila['id'] . ""] = $fila['question'];
-        }
-
-        $result3;
-        for ($i=0;$i<count($result2);$i++){
-          $result3[] = $result2[$values[':asks'][$i]];
-        }
-
-        $json;
-        for($i=0;$i<count($result3);$i++){
-          $json[$result3[$i]] = $values[':responses'][$i];
-        }
-
-        $result2 = $this->dbconex->prepare("UPDATE login_users SET login_ask=:j_son WHERE login_email=:email");
-        $result2->execute(array(":j_son"=>json_encode($json),":email"=>$values[':email']));
-
-        if ($result2->rowCount() >= 1){
-          return array("mode"=>"updated","mensaje"=>"Se han actualizado las preguntas de seguridad");
-        }
+      if ($query->rowCount() == 1){
+        return array("mode"=>"updated","mensaje"=>"Se han actualizado las preguntas de seguridad");
+      } else {
+        return array("mode"=>"no","mensaje"=>"No se ha podido actualizar las preguntas de seguridad");
       }
     }
 
-    public function search_users($values){
-      $result = $this->dbconex->query("SELECT login_user FROM login_users WHERE LOWER(login_user) LIKE LOWER('" . $values[':user'] . "%') AND login_email<>'" . $values[':email'] . "'",PDO::FETCH_OBJ);
+    public function search_users($searchUser){
+      $user = self::selectUser();
+      $query = $this->dbconex->query("SELECT login_user FROM login_users WHERE LOWER(login_user) LIKE LOWER('" . $searchUser . "%') AND login_email<>'" . $user['login_email'] . "'",PDO::FETCH_OBJ);
       
-      $result2;
-      foreach($result as $value){
-        $result2[] = $value;
+      $users;
+      foreach($query as $value){
+        $users[] = $value;
       }
 
-      return array("usuarios"=>$result2 == null || $values[':user'] == "" ? "" : $result2);
+      return array("usuarios"=>$users == null || $searchUser == "" ? "" : $users);
     }
   }
 

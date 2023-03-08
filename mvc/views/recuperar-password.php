@@ -160,13 +160,13 @@
       if (history.state != null){
         let forme = new FormData();
         forme.append('recuperar',history.state.email);
-        fetch("../controllers/login_controller.php",{
+        fetch("../controllers/loged_controller.php",{
           method: "POST",
           body: forme
         }).then(res=>res.json()).then(res=>{
-          let datos = JSON.parse(res.mensaje);
+          let json = JSON.parse(res);
           let i=0;
-          for (let arr in datos){
+          for (let arr in json){
             document.querySelectorAll('.ask')[i].textContent = arr;
             i++;
           }
@@ -200,8 +200,8 @@
               if (res.mode == "ok-reccovery"){
                 document.querySelector('.second-form').style.display = "flex";
                 document.querySelector('.first-form').style.display = "none";
-              } else if (res.mode == "ok-changed") {
-                history.replaceState({mode:"edit",mensaje:res.mensaje},'','index.php');
+              } else if (res.mode == "updated") {
+                history.replaceState({mode:"edit",mensaje:res.mensaje},'','../../index.php');
                 location.reload();
               } else {
                 return mensaje(res.mode,res.mensaje);

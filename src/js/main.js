@@ -87,7 +87,6 @@ window.addEventListener('load',()=>{
 						history.replaceState({'mode':res.mode,'mensaje':res.mensaje}, '', 'index.php');
 						location.reload();
 					} else if (res.mode == "ok"){
-						console.log(res.mensaje);
 						location.reload();
 					} else mensaje(res.mode,res.mensaje);
 				});

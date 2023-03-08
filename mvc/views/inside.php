@@ -1,12 +1,3 @@
-<?php 
-
-  if(isset($_POST['volver'])){
-    setcookie("user","",time()-1);
-    header("location:index.php");
-  }
-
-?>
-
 <link rel="stylesheet" href="src/styles/inside.css">
 
 <div class="box">
