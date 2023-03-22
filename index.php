@@ -120,7 +120,7 @@
         <input type="submit" value="Registrarse" name="register-ask" style="cursor: pointer;">
 			</form>
 		</div>
-	</div>
+	</div>	
 	<script src="src/js/main.js"></script>
 	<?php else: require_once('mvc/views/inside.php'); endif;?>
 	<footer class="footer">

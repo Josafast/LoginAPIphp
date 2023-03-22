@@ -15,6 +15,7 @@
 }
 
 .box .info {
+  transition: 0.3s;
   padding-top: 30px;
   position: relative;
   width: 325px;
@@ -24,13 +25,22 @@
   align-items: center;
 }
 
+.body.active .box .info {
+  transform: translateX(-325px);
+}
+
 .box .chat-profile {
+  transition: .3s;
   color: #fff;
   display: flex;
   flex-flow: column;
   align-items: center;
   position: relative;
   width: 325px;
+}
+
+.body.active .chat-profile{
+  transform: translateX(-325px);
 }
 
 .box .chat-profile .profile-img {
@@ -108,6 +118,9 @@
 
 
 
+.body.active .type .screen.chat-screen{
+  margin-left: 0% !important;
+}
 
 .box .type .screen.chat-screen section {
   padding: 0 10px;
@@ -120,7 +133,6 @@
 .box .type .screen.chat-screen section span.back-chat {
   cursor: pointer;
   display: flex;
-  padding-top: 8px;
   position: relative;
   color: var(--clr);
   font-size: 1.4em;
@@ -140,6 +152,8 @@
   background-color: var(--clr);
   width: 100%;
   height: 100%;
+  padding-bottom: 10px;
+  overflow-y: auto;
 }
 
 .box .type .screen.chat-screen .messages .msg {
@@ -155,19 +169,19 @@
   margin: 10px 0 0 20px;
 }
 
-.box .type .screen.chat-screen .messages .msg.receptor {
+.box .type .screen.chat-screen .messages .msg.emisor {
   margin: 10px 20px 0 auto;
 }
 
-.box .type .screen.chat-screen .messages .msg.emisor {
+.box .type .screen.chat-screen .messages .msg.receptor {
   border-radius: 0 5px 5px 5px;
 }
 
-.box .type .screen.chat-screen .messages .msg.receptor {
+.box .type .screen.chat-screen .messages .msg.emisor {
   border-radius: 5px 0 5px 5px;
 }
 
-.box .type .screen.chat-screen .messages .msg.emisor::before {
+.box .type .screen.chat-screen .messages .msg.receptor::before {
   content: '';
   background-color: #fff;
   width: 10px;
@@ -178,7 +192,7 @@
   clip-path: polygon(100% 0, 0 0, 100% 100%);
 }
 
-.box .type .screen.chat-screen .messages .msg.receptor::before {
+.box .type .screen.chat-screen .messages .msg.emisor::before {
   content: '';
   background-color: #fff;
   width: 10px;
@@ -192,6 +206,17 @@
   margin-top: 5px;
   color: #888;
   font-size: .7em;
+}
+
+.box .type .screen.chat-screen .messages .floatMsg {
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: #ddd;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+  padding: 5px;
+  font-size: .8em;
+  margin: 10px auto 0;
 }
 
 .box .type .screen.chat-screen input {
@@ -251,6 +276,7 @@
 }
 
 .box .type .screen.chats .search .chat span, .screen.buscar .search .users span {
+  flex-shrink: 0;
   margin-left: 10px;
   height: 70%;
   width: 50px;
@@ -276,6 +302,12 @@
   margin: 3px 0 0 6px;
   font-size: .9em;
   color: #777;
+  height: 20px;
+  overflow: hidden;
+}
+
+.box .type .screen.chats .search .chat div h3.bold{
+  font-weight: 700;
 }
 
 .box .back .volver {
@@ -423,6 +455,12 @@
 .box .type .screen.other-profile button {
   color: #fff;
   background-color: var(--clr);
+}
+
+.box .type .screen.other-profile button.disabled {
+  color: #777;
+  background-color: #ddd;
+  pointer-events: none;
 }
 
 .box .type .screen.change-password .password-form {

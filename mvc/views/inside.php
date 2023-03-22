@@ -19,9 +19,9 @@
     </div>
     <div class="chat-profile">
       <span class="profile-img"></span>
-      <h2>Josafat</h2>
+      <h2 class="otherUser">Persona</h2>
       <h4>Amigo</h4>
-      <button>Eliminar de amigos</button>
+      <button class="reject_friend">Eliminar de amigos</button>
     </div>
   </div>
   <div class="type">
@@ -31,14 +31,7 @@
         <span class="user">Josafat</span>
       </section>
       <div class="messages">
-        <span class="msg emisor">
-          <p>Estoy enviando un mensaje de prueba</p>
-          <b>Hora: 12:45</b>
-        </span>
-        <span class="msg receptor">
-          <p>Recibido</p>
-          <b>Hora: 12:45</b>
-        </span>
+        
       </div>
       <input type="text">
       <span class="send"><ion-icon name="send-sharp"></ion-icon></span>
@@ -47,48 +40,6 @@
       <h2>Chats</h2>
       <input type="text" class="local_search">
       <div class="search">
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
-        <div class="chat">
-          <span></span>
-          <div>
-            <h2>Josafat</h2>
-            <h3>Tu: Texto</h3>
-          </div>
-        </div>
       </div>
     </div>
     <div class="screen buscar">

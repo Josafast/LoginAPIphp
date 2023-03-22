@@ -9,7 +9,7 @@
       parent::__construct();
     }
 
-    public function enter($values){
+    public function enter(array $values):array{
       $user = parent::selectUser($values[':email']);
 
       if ($user){
@@ -31,7 +31,7 @@
       }
     }
 
-    public function register($values){
+    public function register(array $values):array{
       $user = parent::selectUser($values[':email']);
       if(!$user){
         $asksAndResponses = parent::selectAsks(array($values[':asks'],$values[':responses']));
@@ -39,13 +39,16 @@
         $query=$this->dbconex->prepare("INSERT INTO login_users(login_user,login_email,login_password,login_ask) VALUES (:user,:email,:pass,:j_son)");
         $query->execute(array(":user"=>$values[':user'],":email"=>$values[':email'],":pass"=>$values[':pass'],":j_son"=>json_encode($asksAndResponses)));
 
-        if ($query->rowCount() == 1){
+        $query2=$this->dbconex->prepare("INSERT INTO login_chat(login_user) VALUES (:user)");
+        $query2->execute(array(":user"=>$values[':user']));
+
+        if ($query->rowCount() == 1 && $query2->rowCount() == 1){
           return array("mode"=>"add","mensaje"=>"Se ha agregado el usuario");
         } else return array("mode"=>"no","mensaje"=>"No se ha podido agregar el usuario");
       } else return array("mode"=>"no","mensaje"=>"El usuario ya existe");
     } 
 
-    public function ask_question($email,$responses){
+    public function ask_question(string $email,array $responses):array{
       $user = parent::selectUser($email);
       if ($user){
         $asks = json_decode($user['login_ask']);

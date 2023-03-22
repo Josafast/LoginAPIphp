@@ -18,7 +18,7 @@
       }
     }
 
-    protected function jwt($data){
+    protected function jwt(array $data):array{
       $token = array(
         "iat" => time(),
         "exp" => time() + (60*60),
@@ -31,7 +31,7 @@
       return [$jwt,$token['exp']];
     }
     
-    protected function selectUser($email){
+    protected function selectUser(string $email){
       $query = $this->dbconex->prepare("SELECT * FROM login_users WHERE login_email=:email");
       $query->execute(array(":email"=>$email));
 
@@ -44,7 +44,7 @@
       } else return "";
     }
 
-    protected function selectAsks($AskIdAndResponses){
+    protected function selectAsks(array $AskIdAndResponses):array{
       $result = $this->dbconex->prepare("SELECT * FROM login_questions WHERE id=? OR id=? OR id=?");
       $result->execute($AskIdAndResponses[0]);
 
@@ -66,6 +66,20 @@
 
       return $json;
       }
+    }
+
+    protected function selectChat(string $user):array{	
+      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
+      $id = $token->data->id; 
+      $query = $this->dbconex->prepare("SELECT * FROM login_chat WHERE id=:id OR login_user=:user");
+      $query->execute(array(":id"=>$id,":user"=>$user));
+
+      $Users;
+      while($fila = $query->fetch(PDO::FETCH_ASSOC)){
+        $Users[] = $fila;
+      }
+
+      return $Users;
     }
   }
 

@@ -1,10 +1,195 @@
+class Chat{
+  writeMessages(msj, mode){
+      let date = new Date(msj.date);
+      let msg = document.createElement('span');
+      msg.classList.add('msg');
+      msg.classList.add(mode);
+      let messageContent = document.createElement('p');
+      let messageTime = document.createElement('b');
+      messageContent.textContent = msj.content;
+      messageTime.textContent = `Hora: ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
+      msg.appendChild(messageContent);
+      msg.appendChild(messageTime);
+
+      return msg;
+  }
+
+  sendMessage(input, nombre){
+    if (input.value == ""){
+      return mensaje("no","No puedes enviar un mensaje vacío");
+    }
+
+    if (this.noAny){
+      document.querySelector('.messages').removeChild(this.noAny);
+    }
+
+    let actual = Date.now();
+    document.querySelector('.messages').appendChild(this.writeMessages({"content":input.value,"date":actual}, 'emisor'));
+
+    let object =
+      {
+        "receptor":nombre,
+        "content":input.value,
+        "date":actual
+      };
+      fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
+        "request":"sendMessage",
+        "body":object
+        })}).then(res=>res.json())
+            .then(res=>{
+              this.updateChats(res.emisor);
+            });
+    input.value = "";
+  }
+
+  chatConstructor(nombre, data){
+    if (data != "not"){
+      let chat = document.createElement('div');
+      chat.classList.add('chat');
+      
+      let image = document.createElement('span');
+
+      let name = document.createElement('h2');
+      name.textContent = nombre;
+      let chatInfo = document.createElement('h3');
+
+      if (data == "Accept" || data == "Friend" || data.length == 0){
+        chatInfo.classList.add('bold');
+        chatInfo.textContent = data == "Accept" ? "Te ha enviado una solicitud de amistad" : data == "Friend" ? "¡Salúdalo!" : "¡Escribe el primer mensaje!";
+      } else chatInfo.textContent = data.emisor != nombre ? 'Tu: ' + data.content : data.content;
+
+      let info = document.createElement('div');
+      info.appendChild(name);
+      info.appendChild(chatInfo);
+
+      chat.appendChild(image);
+      chat.appendChild(info);
+
+      document.querySelector('.search').appendChild(chat);
+    
+      chat.addEventListener('click',(e)=>{
+        if (data == 'Accept'){
+          document.querySelector('.other-profile').children[1].textContent = nombre;
+          document.querySelector('.buscar').classList.remove('active');
+          document.querySelector('.other-profile').classList.add('active');
+          document.querySelector('.solicitud').textContent = "Aceptar solicitud";
+          document.querySelector('.solicitud').classList.remove('disabled');
+          return
+        }
+        this.getChat(nombre);
+
+        document.querySelector('.body').classList.add('active');
+
+        document.querySelector('.back-chat').addEventListener('click',()=>{
+          document.querySelector('.body').classList.remove('active')
+          clearInterval(this.waitingMessage);
+        });
+
+        document.querySelector('.otherUser').textContent = nombre;
+        document.querySelector('.user').textContent = nombre;
+
+        document.querySelector('.send').previousElementSibling.addEventListener('keyup',(e)=>{
+          if (e.code == 'Enter' && document.querySelector('.send').previousElementSibling.value != ''){
+            this.sendMessage(e.target, nombre);
+          }
+        });
+        document.querySelector('.send').addEventListener('click',(e)=>{
+          if (document.querySelector('.send').previousElementSibling.value != ''){
+            this.sendMessage(e.target.parentElement.previousElementSibling, nombre);
+          }
+        });
+
+        document.querySelector('.reject_friend').addEventListener('click',()=>{
+          fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
+            "request":"rejectFriend",
+            "body":nombre
+          })}).then(res=>res.json())
+              .then(res=>{
+                console.log(res);
+                if (res.status){
+                  clearInterval(this.waitingMessage);
+                  this.updateChats();
+                  document.querySelector('.body').classList.remove('active');
+                }
+              });
+        });
+
+        document.querySelector('.search').appendChild(chat);
+
+        this.waitingMessage = setInterval(()=>{
+          fetch('./mvc/controllers/chat_controller.php',{method: 'PHP', body:JSON.stringify({
+            "request":"getLastMessage",
+            "body":nombre
+          })}).then(res=>res.json())
+              .then(res=>{
+                if (res.length > 0){
+                    this.lastMessage = res;
+                    document.querySelector('.messages').appendChild(this.writeMessages(res, res.emisor == nombre ? 'receptor' : 'emisor'));
+                  }
+                  document.querySelector('.messages').scrollTop = document.querySelector('.messages').scrollHeight;
+              });
+        },500);
+      })
+    } 
+  }
+  
+  getChat(nombre){
+    fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
+      "request":"getCurrentChat",
+      "body":nombre
+    })}).then(res=>res.json())
+        .then(res=>{
+          console.log(res);
+          document.querySelector('.messages').innerHTML = "";
+          if (res.message){
+            this.noAny = document.createElement('span');
+            this.noAny.classList.add('floatMsg');
+            this.noAny.textContent = res.message;
+            document.querySelector('.messages').appendChild(this.noAny);
+            return;
+          }
+          let fragment = document.createDocumentFragment();
+          this.lastMessage = res[res.length-1];
+          res.map(msg=>{
+            let msj = this.writeMessages(msg, msg.emisor == nombre ? 'receptor' : 'emisor');
+            fragment.appendChild(msj);
+          });
+          document.querySelector('.messages').appendChild(fragment);
+          document.querySelector('.messages').scrollTop = document.querySelector('.messages').scrollHeight;
+        });
+  }
+
+  updateChats(nombre){
+    fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
+      "request":"getChats"
+    })}).then(res=>res.json())
+        .then(res=>{
+          document.querySelector('.search').innerHTML = "";
+          if (res.mensaje){
+            return console.log(res.mensaje);
+          }
+          res.map(user=>{
+            console.log(user);
+            this.chatConstructor(user.name,user.info == "" || user.info == null ? "Friend" : user.info);
+          })
+        });
+  }  
+
+    constructor(){
+      this.updateChats();
+    }
+  }
+
+let ChaT;
+
 fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
   .then(res=>res.json())
   .then(res=>{
     document.querySelector('.emailPHP').textContent = res.login_email;
     document.querySelectorAll(".nombrePHP").forEach(element=>{
-      element.textContent = res.login_user
+      element.textContent = res.login_user;
     });
+    ChaT = new Chat();
   });
 
 window.addEventListener("load",()=>{
@@ -32,6 +217,8 @@ window.addEventListener("load",()=>{
         if (scrEEn.classList.contains(e.target.id)) scrEEn.classList.add('active');  
         else scrEEn.classList.remove('active');
 
+        if (e.target.id == "chats") ChaT.updateChats(document.querySelectorAll(".nombrePHP")[0].textContent);
+
         if (e.target.id != "chats") chat.setAttribute("style","opacity:0");
         else chat.removeAttribute("style"); 
       });
@@ -39,13 +226,18 @@ window.addEventListener("load",()=>{
   });
 
   document.querySelector('.solicitud').addEventListener('click',(e)=>{
-    console.log(e.target.previousElementSibling.textContent);
+    fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({"request":(e.target.textContent == "Enviar solicitud" ? "sendSolicitude" : "acceptSolicitude"),"body":e.target.previousElementSibling.textContent})})  
+      .then(res=>res.json())
+      .then(res=>{
+        if (res.status == "sended"){
+          ChaT.updateChats(document.querySelectorAll(".nombrePHP")[0].textContent)
+          document.querySelector('.solicitud').classList.add('disabled');
+        } else mensaje(res.status,res.mensaje);
+      });
   });
 
   document.querySelector('.user_search').addEventListener('input',(e)=>{
-    let forme = new FormData();
-    forme.append("busqueda",e.target.value.trim());
-    fetch('./mvc/controllers/loged_controller.php',{method:"POST",body:forme})
+    fetch(`./mvc/controllers/loged_controller.php?search_user=${e.target.value.trim()}`,{method:"POST"})
       .then(res=>res.json())
       .then(res=>{
         document.querySelectorAll('.search')[1].innerHTML = "";
@@ -64,6 +256,8 @@ window.addEventListener("load",()=>{
               document.querySelector('.other-profile').children[1].textContent = res.usuarios[i]['login_user'];
               document.querySelector('.buscar').classList.remove('active');
               document.querySelector('.other-profile').classList.add('active');
+              document.querySelector('.solicitud').textContent = "Enviar solicitud";
+              document.querySelector('.solicitud').classList.remove('disabled');
             });
 
             document.querySelectorAll('.search')[1].appendChild(div[0]);
