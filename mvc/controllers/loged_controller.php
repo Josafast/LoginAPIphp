@@ -3,8 +3,6 @@
   require('../models/loged_model.php');
 
   $loged = new Loged();
-
-  if ($_COOKIE['user']){
     if (isset($_POST['update-password']) || isset($_POST['consultar-recuperacion'])){
       $values = array(
         ":new-pass"=>password_hash(htmlentities(addslashes(trim($_POST['new-password']))),PASSWORD_DEFAULT)
@@ -59,6 +57,4 @@
     if (isset($_POST['recuperar'])){
       echo json_encode($loged->selectUser(htmlentities(addslashes(trim($_POST['recuperar']))))['login_ask']);
     }
-  } else echo json_encode(array("status"=>"no","mensaje"=>"La sesión a caducado, regresa y vuelve a entrar"));
-
 ?>

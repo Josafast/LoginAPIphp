@@ -54,10 +54,7 @@
         $result2["" . $fila['id'] . ""] = $fila['question'];
       }
 
-      $result3;
-      for ($i=0;$i<count($result2);$i++){
-        $result3[] = $result2[$AskIdAndResponses[0][$i]];
-      }
+      $result3 = array_values($AskIdAndResponses[0]);
 
       $json;
       for($i=0;$i<count($result3);$i++){

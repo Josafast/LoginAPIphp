@@ -2,7 +2,7 @@
 
   $jsonData = json_decode(file_get_contents('php://input'), true);
 
-  if ($_COOKIE['user']){
+  try{
     require('../models/chat_model.php');
     $chatObject = new Chat();
 
@@ -29,12 +29,16 @@
         case 'rejectFriend':
           $chatAction = $chatObject->rejectFriend($jsonData['body']);
           break;
+        case 'getUserState':
+          $chatAction = $chatObject->getUserState();
+          break;
         default:
           break;
       }
 
       echo json_encode($chatAction);
     }
-  } else echo json_encode(array("status"=>"no","mensaje"=>"La sesión a caducado, regresa y vuelve a entrar"));
-
+  } catch (Exception $e){
+    echo json_encode(array("error"=>$e->getMessage()));
+  }
 ?>

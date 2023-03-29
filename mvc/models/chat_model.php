@@ -12,11 +12,19 @@
       parent::__construct();
     }
 
+    public function getOwn(){
+      try {
+        $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
+        $email = $token->data->email;
+        $ownName = parent::selectUser($email)['login_user'];
+        return $ownName;
+      } catch (Exception $e){
+        throw new Exception('La sesión ha caducado');
+      }
+    }
+
     public function sendMessage(array $message):array{
-      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-      $email = $token->data->email;
-      $ownUser = parent::selectUser($email);
-      $message['emisor'] = $ownUser['login_user'];
+      $message['emisor'] = self::getOwn();
 
       $chat = $this->dbconex->query("SELECT * FROM login_chat WHERE login_user='" . $message['emisor'] . "' OR login_user='" . $message['receptor'] . "'",PDO::FETCH_ASSOC);
 
@@ -44,23 +52,19 @@
     }
 
     public function getLastMessage(string $name):array{
-      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-      $email = $token->data->email;
-      $ownName = parent::selectUser($email)['login_user'];
-      $chat = $this->dbconex->query("SELECT (login_last_message->'" . $name . "') FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
+      $ownName = self::getOwn();
+      $chat = $this->dbconex->query("SELECT (login_last_message->'" . $name . "')as last_message FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
 
       $lastMessage;
       foreach($chat as $person){
-        $lastMessage = json_decode($person['?column?'], true);
+        $lastMessage = json_decode($person['last_message'], true);
       }
 
-      return $lastMessage;
+      return $lastMessage == null ? array("not-any" => "No hay mensajes") : $lastMessage;
     }
 
     public function getCurrentChat(string $name):array{
-      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-      $email = $token->data->email;
-      $ownName = parent::selectUser($email)['login_user'];
+      $ownName = self::getOwn();
 
       $chat = $this->dbconex->query("SELECT (login_messages->'" . $name . "') FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
 
@@ -72,13 +76,24 @@
       return $msg == null ? array("message"=>"No hay mensajes en este chat") : $msg;
     }
 
+    public function getUserState():array{
+      $ownName = self::getOwn();
+
+      $users = $this->dbconex->query("SELECT login_friend FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
+
+      $userState;
+      foreach($users as $person){
+        $userState = json_decode($person['login_friend'], true);
+      }
+
+      return $userState;
+    }
+
     public function getChats():array{
-      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-      $email = $token->data->email;
-      $ownName = parent::selectUser($email)['login_user'];
+      $ownName = self::getOwn();
 
       $chats = $this->dbconex->query("SELECT * FROM login_chat WHERE login_user<>'" . $ownName . "'",PDO::FETCH_ASSOC);
-      $especificChat = $this->dbconex->prepare("SELECT (login_last_message->:searchedUser) FROM login_chat WHERE login_user=:ownUser");
+      $especificChat = $this->dbconex->prepare("SELECT (login_last_message->:searchedUser) AS lastMessage FROM login_chat WHERE login_user=:ownUser");
 
       $users;
 
@@ -90,7 +105,7 @@
             $especificChat->execute(array(":searchedUser"=>$person['login_user'],":ownUser"=>$ownName));
             $me;
             while($fila = $especificChat->fetch(PDO::FETCH_ASSOC)){
-              $me = json_decode($fila['?column?'], true);
+              $me = json_decode($fila['lastMessage'], true);
             }
           }
           $users[] = array("name"=>$person['login_user'],"info"=>
@@ -111,8 +126,8 @@
       );
 
       $json = array(
-        $users[1]['login_user'] => "Pending",
-        $users[0]['login_user'] => "Sended"
+        $users[1]['login_user'] => "Sended",
+        $users[0]['login_user'] => "Pending"
       );
       
       $query = $this->dbconex->prepare("UPDATE login_chat SET login_friend=:j_son WHERE login_user=:user");
