@@ -126,8 +126,8 @@
       );
 
       $json = array(
-        $users[1]['login_user'] => "Sended",
-        $users[0]['login_user'] => "Pending"
+        $users[1]['login_user'] => "Pending",
+        $users[0]['login_user'] => "Sended"
       );
       
       $query = $this->dbconex->prepare("UPDATE login_chat SET login_friend=:j_son WHERE login_user=:user");

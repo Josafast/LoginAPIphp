@@ -71,6 +71,29 @@
       left: 20px;
       color: var(--clr);
     }
+
+    @media screen and (max-width:580px){
+      body {
+        justify-content: center;
+        padding-bottom: 60px;
+      }
+
+      h1 {
+        margin: 40px 0;
+        font-size: 1.7em;
+      }
+    } 
+
+    @media screen and (max-width: 350px) {
+      h1 {
+        font-size: 1.3em;
+      }
+      
+      .formulario h2 {
+        margin-left: 10px;
+        font-size: 1.3em;
+      } 
+    }
   </style>
   <title>Recuperar contraseña</title>
 </head>
@@ -102,7 +125,7 @@
         <input type="submit" name="enviar" value="Recuperar">
       </form>
       <form action="" class="formulario second-form" style="display:none;">
-        <h2>Contraseña nueva: </h2>
+        <h2 style="margin-left: 0;font-size: 1.3em">Contraseña nueva: </h2>
         <label for="new-password">
           <div class="passwords">
             <input type="password" name="new-password" class="password">
@@ -114,7 +137,7 @@
             </span>
           </div>
         </label>
-        <h2>Confirma tu nueva contraseña: </h2>
+        <h2 style="margin-left: 0;font-size: 1.3em">Confirma tu nueva contraseña: </h2>
         <label for="new-password-confirm">
           <div class="passwords">
             <input type="password" name="new-password-confirm" class="password">

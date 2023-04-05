@@ -1,5 +1,9 @@
 "use strict";
 
+if (navigator.serviceWorker){
+	navigator.serviceWorker.register('sw.js').then(registration=>registration.update());
+}
+
 window.addEventListener('load',()=>{
 	const body = document.querySelector(".body");
 

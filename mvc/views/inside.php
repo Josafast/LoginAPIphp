@@ -3,21 +3,33 @@
 <div class="box">
   <div class="pages">
     <div class="info" style="color: #fff">
-      <h2>Hola <b class="nombrePHP"></b>!</h2>
-      <h3 class="menu">Menú:</h3>
-        <ul style="margin: 0 40px auto;">
-          <li class="menu-option" id="profile" style="border-radius:5px 5px 0 0;">Ver perfil</li>
-          <li class="menu-option" id="chats">Tus chats</li>
-          <li class="menu-option" id="buscar">Buscar personas</li>
-          <li class="menu-option" id="change-password">Cambiar contraseña</li>
-          <li class="menu-option" id="security-ask">Cambiar preguntas de seguridad</li>
-          <li class="menu-option" id="remove-account" style="border-radius: 0 0 5px 5px;">Eliminar cuenta</li>
+      <h2>Hola 
+        <b class="nombrePHP" style="margin-left: 7px;"></b>!
+        <sspan class="menu-button">
+          <ion-icon name="menu" style="display:inline"></ion-icon>
+          <ion-icon name="arrow-back" style="display:none"></ion-icon>
+        </span></h2>
+        <ul>
+          <li class="menu-option" id="profile"><ion-icon name="person-outline"></ion-icon><h6>Tu Perfil</h6></li>
+          <li class="menu-option" id="chats"><ion-icon name="chatbubbles-outline"></ion-icon><h6>Tus Chats</h6></li>
+          <li class="menu-option" id="buscar"><ion-icon name="search-outline"></ion-icon><h6>Buscar Usuarios</h6></li>
+          <li class="menu-option" id="change-password"><ion-icon name="lock-closed-outline"></ion-icon><h6>Cambiar Contraseña</h6></li>
+          <li class="menu-option" id="security-ask"><ion-icon name="help-circle-outline"></ion-icon><h6>Cambiar preguntas de seguridad</h6></li>
+          <li class="menu-option" id="remove-account"><ion-icon name="trash-outline"></ion-icon><h6>Eliminar Cuenta</h6></li>
+          <li>
+            <form action="./" method="post" class="back" style="width:100%">
+              <button type="submit" name="volver" class="volver">
+                <ion-icon name="log-out-outline"></ion-icon>
+                <h6>Cerrar sesión</h6>
+              </button>
+            </form>
+          </li>
         </ul>
-        <form action="./" method="post" class="back">
-          <input type="submit" value="Cerrar sesión" name="volver" class="volver">
-        </form>
     </div>
     <div class="chat-profile">
+      <span class="back-profile">
+        <ion-icon name="arrow-back-sharp"></ion-icon>
+      </span>
       <span class="profile-img"></span>
       <h2 class="otherUser">Persona</h2>
       <h4>Amigo</h4>

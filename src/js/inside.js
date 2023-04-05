@@ -1,3 +1,5 @@
+"use strict";
+
 let body = document.querySelector('.body');
 let chatField = document.querySelector('.messages');
 
@@ -61,6 +63,11 @@ function chatConstructor(nombre, data){
             sendMessage(e.target, nombre);
           }
         });
+
+        document.querySelector('.user').addEventListener('click',()=>{
+          document.querySelector('.type').style.top = "100%";
+        });
+
         document.querySelector('.send').addEventListener('click',(e)=>{
           if (document.querySelector('.send').previousElementSibling.value != ''){
             sendMessage(e.target.parentElement.previousElementSibling, nombre);
@@ -68,10 +75,7 @@ function chatConstructor(nombre, data){
         });
 
 
-        document.querySelector('.reject_friend').addEventListener('click',()=>{
-          navigator.serviceWorker.ready.then(res=>res.active.postMessage(['reject_friend',nombre]));
-          
-        });
+        document.querySelector('.reject_friend').addEventListener('click',()=>navigator.serviceWorker.ready.then(res=>res.active.postMessage(['reject_friend',nombre])));
 
         document.querySelector('.search').appendChild(chat);
       })
@@ -144,8 +148,6 @@ fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
   });
 
   if (navigator.serviceWorker){
-    navigator.serviceWorker.register("sw.js");
-
     navigator.serviceWorker.ready.then(res=>res.active.postMessage(["start",notis]));
 
     window.addEventListener('blur',()=>navigator.serviceWorker.ready.then(res=>res.active.postMessage(['viewing',false])));
@@ -195,6 +197,7 @@ fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
 
       if (e.data[1] == 'rejected'){
         body.classList.remove('active');
+        document.querySelector('.type').removeAttribute('style');
         document.querySelector('.search').removeChild(document.getElementById(e.data[0]).parentElement.parentElement);
       }
     });
@@ -213,9 +216,27 @@ window.addEventListener("load",async ()=>{
       .then(res=>res.json())
       .then(res=>{
         if (res.mode == "ok"){
+          navigator.serviceWorker.ready.then(res=>res.active.postMessage(['end']));
           location.reload();
         }
       })
+  });
+
+  document.querySelector('.menu-button').addEventListener('click',(e)=>{
+    let menu = document.querySelector('.menu-button');
+    let menuButton = menu.children[0];
+    let backButton = menu.children[1];
+    [menuButton.style.display,backButton.style.display] = [backButton.style.display,menuButton.style.display];
+    if (!menu.classList.contains('active')){
+      document.querySelector('.type').style.top = "100%";
+    } else {
+      document.querySelector('.type').removeAttribute('style');
+    }
+    menu.classList.toggle('active');
+  });
+
+  document.querySelector('.back-profile').addEventListener('click',()=>{
+    document.querySelector('.type').removeAttribute('style');
   });
 
   document.querySelectorAll('.menu-option').forEach(element=>{
@@ -226,8 +247,15 @@ window.addEventListener("load",async ()=>{
         else scrEEn.classList.remove('active');
 
         if (e.target.id != "chats") chat.setAttribute("style","opacity:0");
-        else chat.removeAttribute("style"); 
+        else chat.removeAttribute("style");
+
+        document.querySelector('.type').removeAttribute('style');
       });
+      let menu = document.querySelector('.menu-button');
+      let menuButton = menu.children[0];
+      let backButton = menu.children[1];
+      [menuButton.style.display,backButton.style.display] = [backButton.style.display,menuButton.style.display];
+      menu.classList.remove('active');
     });
   });
 
@@ -237,6 +265,7 @@ window.addEventListener("load",async ()=>{
       .then(res=>{
         if (res.status == "sended"){
           document.querySelector('.solicitud').classList.add('disabled');
+          document.querySelector('.other-profile').classList.remove('active');
           location.reload();
         } else mensaje(res.status,res.mensaje);
       });

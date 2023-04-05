@@ -9,14 +9,14 @@ function getChats(){
     "request":"getChats"
   })}).then(res=>res.json())
       .then(res=>{
-        if (!res.mensaje){
           res.map(user=>{
             chat.push({
               name : user.name,
               info : (user.info == "" || user.info == null ? "Friend" : user.info) 
             });
           });
-        }
+      }).catch(err=>{
+        console.log(err);
       });
 }
 
@@ -25,9 +25,12 @@ function usersState(e){
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
       "request":"getUserState"
     })}).then(res=>res.json())
-        .then(res=>{
+        .then(async res=>{
           if (userState){
             if (JSON.stringify(userState) != JSON.stringify(res)){
+              await waitingMessage.map(user=>{
+                clearInterval(user);
+              })
               e.source.postMessage("reboot");
             }
           }
@@ -96,7 +99,6 @@ function rejectFriend(nombre,e){
 
 self.addEventListener('install',()=>{
   console.log("Se ha instalado el service worker");
-  self.skipWaiting();
 });
 
 self.addEventListener('activate',(e)=>{
@@ -104,9 +106,16 @@ self.addEventListener('activate',(e)=>{
 });
 
 self.addEventListener('message',async (e)=>{
+  self.skipWaiting();
   if (e.data[0] == 'start'){
     notis = e.data[1];
     e.source.postMessage([chat,"started"]);
+  }
+
+  if (e.data[0] == 'end' && waitingMessage.length > 0){
+    waitingMessage.map(user=>{
+      clearInterval(user);
+    });
   }
 
   if (e.data[0] == 'viewing'){
