@@ -3,84 +3,75 @@
 let body = document.querySelector('.body');
 let chatField = document.querySelector('.messages');
 
-let notis;
-
-Notification.requestPermission(function(permission){
-  if (permission === "granted") {
-    notis = 'allow';
-  }
-});
-
 function chatConstructor(nombre, data){
-    if (data != "not"){
-      let chat = document.createElement('div');
-      chat.classList.add('chat');
+  if (data != "not"){
+    let chat = document.createElement('div');
+    chat.classList.add('chat');
       
-      let image = document.createElement('span');
+    let image = document.createElement('span');
 
-      let name = document.createElement('h2');
-      name.textContent = nombre;
-      name.id = nombre;
-      let chatInfo = document.createElement('h3');
+    let name = document.createElement('h2');
+    name.textContent = nombre;
+    name.id = nombre;
+    let chatInfo = document.createElement('h3');
 
-      if (data == "Accept" || data == "Friend" || data.length == 0){
-        chatInfo.classList.add('bold');
-        chatInfo.textContent = data == "Accept" ? "Te ha enviado una solicitud de amistad" : data == "Friend" ? "¡Salúdalo!" : "¡Escribe el primer mensaje!";
-      } else chatInfo.textContent = data.emisor != nombre ? 'Tu: ' + data.content : data.content;
+    if (data == "Accept" || data == "Friend" || data.length == 0){
+      chatInfo.classList.add('bold');
+      chatInfo.textContent = data == "Accept" ? "Te ha enviado una solicitud de amistad" : data == "Friend" ? "¡Salúdalo!" : "¡Escribe el primer mensaje!";
+    } else if (data['not-any']) {
+      chatInfo.textContent = "¡Salúdalo!";
+    } else chatInfo.textContent = data.emisor != nombre ? 'Tu: ' + data.content : data.content;
 
-      let info = document.createElement('div');
-      info.appendChild(name);
-      info.appendChild(chatInfo);
+    let info = document.createElement('div');
+    info.appendChild(name);
+    info.appendChild(chatInfo);
 
-      chat.appendChild(image);
-      chat.appendChild(info);
+    chat.appendChild(image);
+    chat.appendChild(info);
 
-      document.querySelector('.search').appendChild(chat);
+    document.querySelector('.search').appendChild(chat);
     
-      chat.addEventListener('click',(e)=>{
-        if (data == 'Accept'){
-          document.querySelector('.other-profile').children[1].textContent = nombre;
-          document.querySelector('.buscar').classList.remove('active');
-          document.querySelector('.other-profile').classList.add('active');
-          document.querySelector('.solicitud').textContent = "Aceptar solicitud";
-          document.querySelector('.solicitud').classList.remove('disabled');
-          return
+    chat.addEventListener('click',()=>{
+      if (data == 'Accept'){
+        document.querySelector('.other-profile').children[1].textContent = nombre;
+        document.querySelector('.buscar').classList.remove('active');
+        document.querySelector('.other-profile').classList.add('active');
+        document.querySelector('.solicitud').textContent = "Aceptar solicitud";
+        document.querySelector('.solicitud').classList.remove('disabled');
+        return
+      }
+      chats.getCurrentChat(nombre);
+
+      body.classList.add('active');
+      document.getElementById(nombre).nextElementSibling.classList.remove('bold');
+
+      document.querySelector('.back-chat').addEventListener('click',()=>{
+        body.classList.remove('active')
+      });
+
+      document.querySelector('.otherUser').textContent = nombre;
+      document.querySelector('.user').textContent = nombre;
+
+      document.querySelector('.send').previousElementSibling.addEventListener('keyup',(e)=>{
+        if (e.code == 'Enter' && document.querySelector('.send').previousElementSibling.value != ''){
+          sendMessage(e.target, nombre);
         }
-        navigator.serviceWorker.ready.then(res=>res.active.postMessage(["getCurrentChat",nombre]));
+      });
 
-        body.classList.add('active');
-        document.getElementById(nombre).nextElementSibling.classList.remove('bold');
+      document.querySelector('.user').addEventListener('click',()=>{
+        document.querySelector('.type').style.top = "100%";
+      });
 
-        document.querySelector('.back-chat').addEventListener('click',()=>{
-          body.classList.remove('active')
-        });
+      document.querySelector('.send').addEventListener('click',(e)=>{
+        if (document.querySelector('.send').previousElementSibling.value != ''){
+          sendMessage(e.target.parentElement.previousElementSibling, nombre);
+        }
+      });
 
-        document.querySelector('.otherUser').textContent = nombre;
-        document.querySelector('.user').textContent = nombre;
-
-        document.querySelector('.send').previousElementSibling.addEventListener('keyup',(e)=>{
-          if (e.code == 'Enter' && document.querySelector('.send').previousElementSibling.value != ''){
-            sendMessage(e.target, nombre);
-          }
-        });
-
-        document.querySelector('.user').addEventListener('click',()=>{
-          document.querySelector('.type').style.top = "100%";
-        });
-
-        document.querySelector('.send').addEventListener('click',(e)=>{
-          if (document.querySelector('.send').previousElementSibling.value != ''){
-            sendMessage(e.target.parentElement.previousElementSibling, nombre);
-          }
-        });
-
-
-        document.querySelector('.reject_friend').addEventListener('click',()=>navigator.serviceWorker.ready.then(res=>res.active.postMessage(['reject_friend',nombre])));
-
-        document.querySelector('.search').appendChild(chat);
-      })
-    } 
-  }
+      document.querySelector('.reject_friend').addEventListener('click',()=>chats.rejectFriend(nombre));
+    })
+  } 
+}
 
 function sendMessage(input, nombre){
   if (input.value == ""){
@@ -100,7 +91,7 @@ function sendMessage(input, nombre){
       "date":actual
     };
 
-  navigator.serviceWorker.ready.then(res=>res.active.postMessage(["send",object]));
+  chats.sendMessage(object);
   input.value = "";
 }
 
@@ -147,79 +138,25 @@ fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
     });
   });
 
-  if (navigator.serviceWorker){
-    navigator.serviceWorker.ready.then(res=>res.active.postMessage(["start",notis]));
-
-    window.addEventListener('blur',()=>navigator.serviceWorker.ready.then(res=>res.active.postMessage(['viewing',false])));
-    window.addEventListener('focus',()=>navigator.serviceWorker.ready.then(res=>res.active.postMessage(['viewing',true])));
-
-    navigator.serviceWorker.addEventListener('message',e=>{
-      console.log(e.data);
-
-      if (e.data == 'reboot' || e.data == 'sessionClosed'){
-        if (e.data == 'sessionClosed'){
-          history.replaceState({'mode':"no",'mensaje':"La sesión ha caducado"},'','index.php');
-        }
-        location.reload();
-      }
-
-      if (e.data[1] == 'started'){
-        document.querySelector('.search').innerHTML = "";
-        e.data[0].map(user=>{
-          chatConstructor(user.name, user.info);
-        });
-        navigator.serviceWorker.ready.then(res=>res.active.postMessage(["list"]));
-      }
-
-      if (e.data[1] == 'chatRecieved'){
-        getChat(e.data[0],e.data[2]);
-      }
-
-      if (e.data[1] == 'newMessage'){
-        document.getElementById(e.data[2]).nextElementSibling.textContent = (e.data[0].receptor == e.data[2] ? 'Tú: ' : '') + e.data[0].content;
-        if (!body.classList.contains('active')){
-          document.getElementById(e.data[2]).nextElementSibling.classList.add('bold');
-        }
-        let usuarioReceptor = document.querySelector('.user').textContent;
-        if (usuarioReceptor == e.data[2]){
-          let msj = writeMessages(e.data[0], e.data[0].receptor == e.data[2] ? 'emisor' : 'receptor');
-          chatField.appendChild(msj);
-          chatField.scrollTop = chatField.scrollHeight;
-        }
-      }
-
-      if (e.data[1] == 'updateChats'){
-        e.data[0].map(user=>{
-          chatConstructor(user.name, user.info);
-        });
-        body.classList.remove('active');
-      }
-
-      if (e.data[1] == 'rejected'){
-        body.classList.remove('active');
-        document.querySelector('.type').removeAttribute('style');
-        document.querySelector('.search').removeChild(document.getElementById(e.data[0]).parentElement.parentElement);
-      }
-    });
-  }
-
 window.addEventListener("load",async ()=>{
   if (history.state){
 		mensaje(history.state.mode,history.state.mensaje);
 		history.replaceState(null,'','');
 	}
 
-  document.querySelector('.back').addEventListener('submit',e=>{
-    e.preventDefault();
-
-    fetch('./mvc/controllers/loged_controller.php?back=true',{method:"GET"})
-      .then(res=>res.json())
-      .then(res=>{
-        if (res.mode == "ok"){
-          navigator.serviceWorker.ready.then(res=>res.active.postMessage(['end']));
-          location.reload();
-        }
-      })
+  document.querySelectorAll('.back').forEach(button=>{
+    button.addEventListener('submit',e=>{
+      e.preventDefault();
+  
+      fetch('./mvc/controllers/loged_controller.php?back=true',{method:"GET"})
+        .then(res=>res.json())
+        .then(res=>{
+          console.log(res);
+          if (res.mode == "ok"){
+            location.reload();
+          }
+        })
+    });
   });
 
   document.querySelector('.menu-button').addEventListener('click',(e)=>{
@@ -266,7 +203,6 @@ window.addEventListener("load",async ()=>{
         if (res.status == "sended"){
           document.querySelector('.solicitud').classList.add('disabled');
           document.querySelector('.other-profile').classList.remove('active');
-          location.reload();
         } else mensaje(res.status,res.mensaje);
       });
   });
@@ -278,27 +214,38 @@ window.addEventListener("load",async ()=>{
         document.querySelectorAll('.search')[1].innerHTML = "";
         if (res.usuarios != ""){
           for (let i=0; i < res.usuarios.length;i++){
-            let div = [document.createElement('div'),document.createElement('div')];
-            div[0].classList.add('users');
-            let span = document.createElement('span');
-            div[0].appendChild(span);
-            let h2 = document.createElement('h2');
-            h2.textContent = res.usuarios[i]['login_user'];
-            div[1].appendChild(h2);
-            div[0].appendChild(div[1]);
+            if (document.querySelectorAll('.nombrePHP')[0].textContent != res.usuarios[i]['login_user']){
+              let div = [document.createElement('div'),document.createElement('div')];
+              div[0].classList.add('users');
+              let span = document.createElement('span');
+              div[0].appendChild(span);
+              let h2 = document.createElement('h2');
+              h2.textContent = res.usuarios[i]['login_user'];
+              div[1].appendChild(h2);
+              div[0].appendChild(div[1]);
 
-            div[0].addEventListener('click',(e)=>{
-              document.querySelector('.other-profile').children[1].textContent = res.usuarios[i]['login_user'];
-              document.querySelector('.buscar').classList.remove('active');
-              document.querySelector('.other-profile').classList.add('active');
-              document.querySelector('.solicitud').textContent = "Enviar solicitud";
-              document.querySelector('.solicitud').classList.remove('disabled');
-            });
+              div[0].addEventListener('click',()=>{
+                document.querySelector('.other-profile').children[1].textContent = res.usuarios[i]['login_user'];
+                document.querySelector('.buscar').classList.remove('active');
+                document.querySelector('.other-profile').classList.add('active');
+                document.querySelector('.solicitud').textContent = "Enviar solicitud";
+                document.querySelector('.solicitud').classList.remove('disabled');
+              });
 
-            document.querySelectorAll('.search')[1].appendChild(div[0]);
+              document.querySelectorAll('.search')[1].appendChild(div[0]);
+            }
           }
         }
       });
+  });
+
+  document.querySelector('.local_search').addEventListener('input',(e)=>{
+    let chatfields = document.querySelectorAll('.chat');
+    chatfields.forEach(element=>{
+      if (element.lastChild.firstChild.textContent.toLowerCase().startsWith(e.target.value)){
+        element.style.display = "flex";
+      } else element.style.display = "none";
+    });
   });
 
   document.querySelectorAll(".form").forEach(forme=>{

@@ -1,0 +1,8 @@
+:root {
+  --clr: gray;
+}
+
+body {
+  user-select: none;
+  pointer-events: none;
+}

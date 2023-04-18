@@ -190,3 +190,5 @@
 </div>
 
 <script src="src/js/inside.js"></script>
+<script src="src/js/chat.js"></script>
+<script src="src/js/loadCss.js"></script>

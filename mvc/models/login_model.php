@@ -45,7 +45,7 @@
         if ($query->rowCount() == 1 && $query2->rowCount() == 1){
           return array("mode"=>"add","mensaje"=>"Se ha agregado el usuario");
         } else return array("mode"=>"no","mensaje"=>"No se ha podido agregar el usuario");
-      } else return array("mode"=>"no","mensaje"=>"El usuario ya existe");
+      } else return array("mode"=>"no","mensaje"=>"El usuario ya existe (El email ya está registrado o el nombre de usuario se está usando)");
     } 
 
     public function ask_question(string $email,array $responses):array{

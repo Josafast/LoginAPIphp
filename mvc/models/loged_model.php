@@ -63,8 +63,8 @@
       $user = self::selectUser();
       $query = $this->dbconex->query("SELECT f.login_user, l.login_friend FROM login_users f INNER JOIN login_chat l ON 
         (f.login_user = l.login_user) AND 
-        (LOWER(f.login_user) LIKE LOWER('" . $searchUser . "%')) AND 
-        (f.login_email <>'" . $user['login_email'] . "')"
+      (LOWER(f.login_user) LIKE LOWER('" . $searchUser . "%')) AND 
+        (f.login_email<>'" . $user['login_email'] . "')"
       ,PDO::FETCH_ASSOC);
       
       $users;

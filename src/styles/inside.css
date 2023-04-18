@@ -512,6 +512,39 @@
   font-weight: 700;
 }
 
+.session_closed {
+  z-index: 50000;
+  position: fixed !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  user-select: all !important;
+  pointer-events: all !important;
+}
+
+.session_closed div {
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.1em;
+  background-color: #eee;
+  width: max-content;
+}
+
+.session_closed div form button {
+  border-top: 1.5px solid #ccc;
+  width: 100%;
+  padding: 15px 20px;
+  font-size: 1.1em;
+  border-radius: 0 0 5px 5px;
+}
+
 @media screen and (max-width: 700px){
   body {
     align-items: start;

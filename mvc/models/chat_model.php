@@ -12,15 +12,17 @@
       parent::__construct();
     }
 
-    public function getOwn(){
-      try {
-        $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-        $email = $token->data->email;
-        $ownName = parent::selectUser($email)['login_user'];
-        return $ownName;
-      } catch (Exception $e){
-        throw new Exception('La sesión ha caducado');
-      }
+    public function getTimeLimit():string{
+      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
+      $expirate = $token->exp;
+      return $expirate; 
+    }
+
+    public function getOwn():string{
+      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
+      $email = $token->data->email;
+      $ownName = parent::selectUser($email)['login_user'];
+      return $ownName;
     }
 
     public function sendMessage(array $message):array{
@@ -91,9 +93,9 @@
 
     public function getChats():array{
       $ownName = self::getOwn();
+      $expirate = self::getTimeLimit();
 
       $chats = $this->dbconex->query("SELECT * FROM login_chat WHERE login_user<>'" . $ownName . "'",PDO::FETCH_ASSOC);
-      $especificChat = $this->dbconex->prepare("SELECT (login_last_message->:searchedUser) AS lastMessage FROM login_chat WHERE login_user=:ownUser");
 
       $users;
 
@@ -102,20 +104,19 @@
         $friendState = json_decode($person['login_friend'], true);
         if (array_key_exists($ownName,$friendState)){
           if ($friendState[$ownName] == "Friend"){
-            $especificChat->execute(array(":searchedUser"=>$person['login_user'],":ownUser"=>$ownName));
-            $me;
-            while($fila = $especificChat->fetch(PDO::FETCH_ASSOC)){
-              $me = json_decode($fila['lastMessage'], true);
-            }
+            $especificChat = self::getLastMessage($person['login_user']);
           }
           $users[] = array("name"=>$person['login_user'],"info"=>
           ($friendState[$ownName] == 'Sended' ? 
-          "Accept" : ($friendState[$ownName] == 'Pending' ? "not" : ($friendState[$ownName] == 'Friend' ? $me : ""))));  
+          "Accept" : ($friendState[$ownName] == 'Pending' ? "not" : ($friendState[$ownName] == 'Friend' ? $especificChat : ""))));  
         }
       }
       $this->dbconex->commit();
 
-      return ($users ? $users : array("mensaje"=>"No posee usuarios agregados"));
+      $users = $users ? $users : array("mensaje"=>"No posee usuarios agregados");
+      $users[] = array("time_limit"=>$expirate - time()); 
+
+      return $users;
     }
 
     public function sendSolicitude(string $searchedUser):array{
