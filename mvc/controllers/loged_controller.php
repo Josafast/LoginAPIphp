@@ -3,6 +3,10 @@
   require('../models/loged_model.php');
 
   $loged = new Loged();
+    if (isset($_GET['cookie_ok'])){
+      echo json_encode($loged->cookieOk());
+    }
+
     if (isset($_POST['update-password']) || isset($_POST['consultar-recuperacion'])){
       $values = array(
         ":new-pass"=>password_hash(htmlentities(addslashes(trim($_POST['new-password']))),PASSWORD_DEFAULT)

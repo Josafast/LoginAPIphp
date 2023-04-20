@@ -25,34 +25,6 @@
       return $ownName;
     }
 
-    public function sendMessage(array $message):array{
-      $message['emisor'] = self::getOwn();
-
-      $chat = $this->dbconex->query("SELECT * FROM login_chat WHERE login_user='" . $message['emisor'] . "' OR login_user='" . $message['receptor'] . "'",PDO::FETCH_ASSOC);
-
-      $chats;
-      while ($fila = $chat->fetch(PDO::FETCH_ASSOC)){
-        $chats[] = $fila;
-      }
-
-      $Send = $this->dbconex->prepare("UPDATE login_chat SET login_messages=:messages, login_last_message=:last_message WHERE login_user=:user");
-
-      $this->dbconex->beginTransaction();
-
-      for($i=0;$i<count($chats);$i++){
-        $sendedUser = array_reverse($chats)[$i]['login_user'];
-        $messages = json_decode($chats[$i]['login_messages'], true);
-        $messages[$sendedUser][] = $message;
-        $user = json_decode($chats[$i]['login_last_message'], true);
-        $user[$sendedUser] = $message;
-        $Send->execute(array(":user"=>$chats[$i]['login_user'],":messages"=>json_encode($messages),":last_message"=>json_encode($user)));
-      }
-
-      $this->dbconex->commit();
-
-      return array($message);
-    }
-
     public function getLastMessage(string $name):array{
       $ownName = self::getOwn();
       $chat = $this->dbconex->query("SELECT (login_last_message->'" . $name . "')as last_message FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
@@ -68,11 +40,11 @@
     public function getCurrentChat(string $name):array{
       $ownName = self::getOwn();
 
-      $chat = $this->dbconex->query("SELECT (login_messages->'" . $name . "') FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
+      $chat = $this->dbconex->query("SELECT (login_messages->'" . $name . "') AS chat FROM login_chat WHERE login_user='" . $ownName . "'",PDO::FETCH_ASSOC);
 
       $msg;
       foreach($chat as $person){
-        $msg = json_decode($person['?column?'], true);
+        $msg = json_decode($person['chat'], true);
       }
 
       return $msg == null ? array("message"=>"No hay mensajes en este chat") : $msg;
@@ -119,86 +91,88 @@
       return $users;
     }
 
-    public function sendSolicitude(string $searchedUser):array{
-      $users = parent::selectChat($searchedUser);
-      $JSONs = array (
-        json_decode($users[0]['login_friend'], true),
-        json_decode($users[1]['login_friend'], true)
-      );
+    public function sendMessage(array $message):void{
+      $message['emisor'] = self::getOwn();
+      $users = array($message['emisor'],$message['receptor']);
+      $reverseUsers = array_reverse($users);
 
-      $json = array(
-        $users[1]['login_user'] => "Pending",
-        $users[0]['login_user'] => "Sended"
-      );
-      
-      $query = $this->dbconex->prepare("UPDATE login_chat SET login_friend=:j_son WHERE login_user=:user");
+      $query = "SELECT jsonb_array_length(login_messages->'".$message['receptor']."') FROM login_chat WHERE login_user='".$message['emisor']."'";
+
+      $count;
+      foreach($this->dbconex->query($query) as $row){
+        $count = $row['jsonb_array_length'];
+      }
+
+      $Send = $this->dbconex->prepare("UPDATE login_chat SET login_messages = jsonb_set(login_messages, :lastArrayIndex, :last_message) ,login_last_message=jsonb_set(login_last_message, :userField, :last_message) WHERE login_user=:user");
 
       $this->dbconex->beginTransaction();
 
-      foreach($json as $person => $value){
-        $addJson = $JSONs[0];
-        $addJson[$person] = $value;
-        $query->execute(array(":j_son"=>json_encode($addJson),":user"=>array_key_last($json)));
-        $json = array_reverse($json);
-        $JSONs = array_reverse($JSONs);
+      for($i=0;$i<2;$i++){
+        $sendedUser = $reverseUsers[$i];
+        $Send->execute(array(":user"=>$users[$i], ":last_message"=>json_encode($message), ":userField"=>'{'.$sendedUser.'}', ":lastArrayIndex"=>"{ $sendedUser,$count }"));
       }
 
       $this->dbconex->commit();
-
-      return array("status"=>"sended","mensaje"=>"Solicitud enviada");
     }
 
-    public function acceptSolicitude(string $friend):array{
-      $users = parent::selectChat($friend);
-      $JSONs = array (
-        json_decode($users[0]['login_friend'], true),
-        json_decode($users[1]['login_friend'], true)
-      );
+    public function sendSolicitude(string $searchedUser):void{
+      $ownUser = self::getOwn();
+      $users = array($searchedUser, $ownUser);
+      $statusArray = array("Sended","Pending");
+      
+      $query = $this->dbconex->prepare("UPDATE login_chat SET login_friend=jsonb_set(login_friend, :userField, :friendStatus) WHERE login_user=:user");
 
-      $query = $this->dbconex->prepare("UPDATE login_chat SET login_friend=:friends, login_messages=:messages, login_last_message=:last_friend WHERE login_user=:user");
+      $this->dbconex->beginTransaction();
+
+      for($i=0; $i<2; $i++){
+        $query->execute(array(":userField"=>'{'.$users[$i].'}',":friendStatus"=>"\"$statusArray[$i]\"",":user"=>array_reverse($users)[$i]));
+      }
+
+      $this->dbconex->commit();
+    }
+
+    public function acceptSolicitude(string $friend):void{
+      $ownUser = self::getOwn();
+      $users = array($ownUser,$friend);
+      $reverseUsers = array_reverse($users);
+
+      $query = $this->dbconex->prepare("UPDATE login_chat 
+        SET login_friend=jsonb_set(login_friend, :userField, '\"Friend\"'), 
+            login_messages=jsonb_set(login_messages, :userField, '[]'), 
+            login_last_message=jsonb_set(login_last_message, :userField, '\"\"') 
+        WHERE login_user=:user");
 
       $this->dbconex->beginTransaction();
 
       for($i=0;$i<count($users);$i++){
-        $j = $i == 0 ? 1 : 0;
-        $JSONs[$j][$users[$i]['login_user']] = 'Friend';
-        $messages = json_decode($users[$j]['login_messages'],true);
-        $messages[$users[$i]['login_user']] = array();
-        $lastUser = json_decode($users[$j]['login_last_message'],true);
-        $lastUser[$users[$i]['login_user']] = array();
         $query->execute(array(
-          ":friends"=>json_encode($JSONs[$j]),
-          ":user"=>$users[$j]['login_user'],
-          ":messages"=>json_encode($messages),
-          ":last_friend"=>json_encode($lastUser)
+          ":user"=>$users[$i],
+          ":userField"=>'{'.$reverseUsers[$i].'}'
         ));
       }
 
       $this->dbconex->commit();
-
-      return array("status"=>"sended","mensaje"=>"Solicitud enviada");
     }
 
-    public function rejectFriend($name){
-      $chats = parent::selectChat($name);
-      $Send = $this->dbconex->prepare("UPDATE login_chat SET login_messages=:messages, login_last_message=:last_message, login_friend=:friend WHERE login_user=:user");
+    public function rejectFriend(string $name):void{
+      $users = array(self::getOwn(),$name);
+      $reverseUsers = array_reverse($users);
+      $reject = $this->dbconex->prepare("UPDATE login_chat
+        SET login_messages = login_messages - :rejectedUser,
+            login_last_message = login_last_message - :rejectedUser,
+            login_friend = login_friend - :rejectedUser
+        WHERE login_user=:user");
 
       $this->dbconex->beginTransaction();
 
-      for($i=0;$i<count($chats);$i++){
-        $sendedUser = array_reverse($chats)[$i]['login_user'];
-        $messages = json_decode($chats[$i]['login_messages'], true);
-        $lastMessage = json_decode($chats[$i]['login_last_message'], true);
-        $friendState = json_decode($chats[$i]['login_friend'], true);
-        unset($messages[$sendedUser]);
-        unset($lastMessage[$sendedUser]);
-        unset($friendState[$sendedUser]);
-        $Send->execute(array(":user"=>$chats[$i]['login_user'],":messages"=>json_encode($messages),":last_message"=>json_encode($lastMessage),":friend"=>json_encode($friendState)));
+      for($i=0;$i<2;$i++){
+        $reject->execute(array(
+          ":rejectedUser"=>$reverseUsers[$i],
+          ":user"=>$users[$i]
+        ));
       }
 
       $this->dbconex->commit();
-
-      return array("status"=>"Amigo eliminado");
     }
   }
   

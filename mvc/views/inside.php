@@ -1,4 +1,13 @@
 <link rel="stylesheet" href="src/styles/inside.css">
+<script>
+  fetch('./mvc/controllers/loged_controller.php?cookie_ok=true')
+    .then(res=>res.json())
+    .then(res=>{
+      if (res.status == "wrong"){
+        location.reload();
+      }
+    });
+</script>
 
 <div class="box">
   <div class="pages">

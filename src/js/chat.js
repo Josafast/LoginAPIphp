@@ -110,9 +110,8 @@ class Chat {
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
       "request":"rejectFriend",
       "body":nombre
-    })}).then(res=>{
-      body.classList.remove('active');
-    })
+    })});
+    body.classList.remove('active');
   }
 }
 

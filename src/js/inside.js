@@ -197,14 +197,9 @@ window.addEventListener("load",async ()=>{
   });
 
   document.querySelector('.solicitud').addEventListener('click',(e)=>{
-    fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({"request":(e.target.textContent == "Enviar solicitud" ? "sendSolicitude" : "acceptSolicitude"),"body":e.target.previousElementSibling.textContent})})  
-      .then(res=>res.json())
-      .then(res=>{
-        if (res.status == "sended"){
-          document.querySelector('.solicitud').classList.add('disabled');
-          document.querySelector('.other-profile').classList.remove('active');
-        } else mensaje(res.status,res.mensaje);
-      });
+    fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({"request":(e.target.textContent == "Enviar solicitud" ? "sendSolicitude" : "acceptSolicitude"),"body":e.target.previousElementSibling.textContent})});
+    document.querySelector('.solicitud').classList.add('disabled');
+    document.querySelector('.other-profile').classList.remove('active');
   });
 
   document.querySelector('.user_search').addEventListener('input',(e)=>{

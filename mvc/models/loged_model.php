@@ -21,6 +21,20 @@
       return $user;
     }
 
+    public function cookieOk():array{
+      $ckokay = $this->dbconex->query("SELECT id FROM login_users WHERE login_token='" . $_COOKIE['user'] . "'",PDO::FETCH_ASSOC);
+      $user;
+      foreach($ckokay as $value){
+        $user = $value;
+      }
+
+      if ($user == null){
+        setcookie('user',"",time()-1,"/");
+      }
+
+      return array("status"=>($user == null ? "wrong" : "ok"));
+    }
+
     public function updatePassword(array $values):array{
       $user = self::selectUser();
       $email = $user['login_email'];

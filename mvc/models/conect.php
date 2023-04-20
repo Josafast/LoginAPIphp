@@ -64,20 +64,6 @@
       return $json;
       }
     }
-
-    protected function selectChat(string $user):array{	
-      $token = JWT::decode($_COOKIE['user'], new Key($_ENV['JWT_TOKEN_KEY'],$_ENV['JWT_TOKEN_HASH']));
-      $id = $token->data->id; 
-      $query = $this->dbconex->prepare("SELECT * FROM login_chat WHERE id=:id OR login_user=:user");
-      $query->execute(array(":id"=>$id,":user"=>$user));
-
-      $Users;
-      while($fila = $query->fetch(PDO::FETCH_ASSOC)){
-        $Users[] = $fila;
-      }
-
-      return $Users;
-    }
   }
 
 ?>
