@@ -1,6 +1,5 @@
 <?php
 
-  error_reporting(E_ERROR | E_PARSE);
   require_once '..\..\vendor\autoload.php';
   use Firebase\JWT\JWT;
   use Firebase\JWT\Key;
@@ -69,8 +68,7 @@
 
       $chats = $this->dbconex->query("SELECT * FROM login_chat WHERE login_user<>'" . $ownName . "'",PDO::FETCH_ASSOC);
 
-      $users;
-
+      $users = [];
       $this->dbconex->beginTransaction();
       foreach($chats as $person){
         $friendState = json_decode($person['login_friend'], true);
@@ -85,8 +83,8 @@
       }
       $this->dbconex->commit();
 
-      $users = $users ? $users : array("mensaje"=>"No posee usuarios agregados");
-      $users[] = array("time_limit"=>$expirate - time()); 
+      $users = count($users) > 0 ? array("users"=>$users) : array("mensaje"=>"No posee usuarios agregados");
+      $users['time_limit'] = $expirate - time(); 
 
       return $users;
     }
@@ -113,6 +111,25 @@
       }
 
       $this->dbconex->commit();
+    }
+
+    public function searchUsers(string $searchedUser):array{
+      if ($searchedUser == ""){
+        return array("usuarios"=>"");
+      }
+      $searchedUser = htmlentities(addslashes($searchedUser));
+      $user = self::getOwn();
+      $query = $this->dbconex->query("SELECT login_user, login_friend FROM login_chat 
+      WHERE LOWER(login_user) LIKE '".$searchedUser."%' AND login_user<>'".$user."'",PDO::FETCH_ASSOC);
+      
+      $users = [];
+      foreach($query as $value){
+        if (!array_key_exists($user,json_decode($value['login_friend'], true))){
+          $users[] = $value;
+        }
+      }
+
+      return array("usuarios"=>count($users) == 0 ? "" : $users);
     }
 
     public function sendSolicitude(string $searchedUser):void{

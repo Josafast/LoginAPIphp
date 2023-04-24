@@ -19,12 +19,12 @@
           <ion-icon name="arrow-back" style="display:none"></ion-icon>
         </span></h2>
         <ul>
-          <li class="menu-option" id="profile"><ion-icon name="person-outline"></ion-icon><h6>Tu Perfil</h6></li>
-          <li class="menu-option" id="chats"><ion-icon name="chatbubbles-outline"></ion-icon><h6>Tus Chats</h6></li>
-          <li class="menu-option" id="buscar"><ion-icon name="search-outline"></ion-icon><h6>Buscar Usuarios</h6></li>
-          <li class="menu-option" id="change-password"><ion-icon name="lock-closed-outline"></ion-icon><h6>Cambiar Contraseña</h6></li>
-          <li class="menu-option" id="security-ask"><ion-icon name="help-circle-outline"></ion-icon><h6>Cambiar preguntas de seguridad</h6></li>
-          <li class="menu-option" id="remove-account"><ion-icon name="trash-outline"></ion-icon><h6>Eliminar Cuenta</h6></li>
+          <li class="menu-option" id="profile"><ion-icon name="person"></ion-icon><h6>Tu Perfil</h6></li>
+          <li class="menu-option" id="chats"><ion-icon name="chatbubbles"></ion-icon><h6>Tus Chats</h6></li>
+          <li class="menu-option" id="user_find"><ion-icon name="search"></ion-icon><h6>Buscar Usuarios</h6></li>
+          <li class="menu-option" id="change-password"><ion-icon name="lock-closed"></ion-icon><h6>Cambiar Contraseña</h6></li>
+          <li class="menu-option" id="security-ask"><ion-icon name="help-circle"></ion-icon><h6>Cambiar preguntas de seguridad</h6></li>
+          <li class="menu-option" id="remove-account"><ion-icon name="trash"></ion-icon><h6>Eliminar Cuenta</h6></li>
           <li>
             <form action="./" method="post" class="back" style="width:100%">
               <button type="submit" name="volver" class="volver">
@@ -63,7 +63,7 @@
       <div class="search">
       </div>
     </div>
-    <div class="screen buscar">
+    <div class="screen user_find">
       <h2>Buscar</h2>
       <input type="text" class="user_search">
       <div class="search">
@@ -199,5 +199,6 @@
 </div>
 
 <script src="src/js/inside.js"></script>
-<script src="src/js/chat.js"></script>
+<script src="src/js/chatMethods.js"></script>
+<script src="src/js/chatFetch.js"></script>
 <script src="src/js/loadCss.js"></script>

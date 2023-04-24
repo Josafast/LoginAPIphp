@@ -12,7 +12,7 @@
         ":new-pass"=>password_hash(htmlentities(addslashes(trim($_POST['new-password']))),PASSWORD_DEFAULT)
       );
   
-      if ($_POST['consultar-recuperacion'] == null) {
+      if (!array_key_exists('consultar-recuperacion',$_POST)) {
         $comprobar = $loged->selectUser();
         if (!password_verify(htmlentities(addslashes(trim($_POST['old-password']))),$comprobar['login_password'])){
           echo json_encode(array("mode"=>"no","mensaje"=>"La contraseña no es la correcta"));
@@ -38,12 +38,6 @@
       $updated = $loged->update_asks($values);
   
       echo json_encode($updated);
-    }
-  
-    if (isset($_GET['search_user'])){
-      $users = $loged->search_users(htmlentities(addslashes(trim($_GET['search_user']))));
-  
-      echo json_encode($users);
     }
   
     if (isset($_GET['userInfo'])){

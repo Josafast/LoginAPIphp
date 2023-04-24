@@ -169,7 +169,26 @@
   width: 100%;
   height: 100%;
   padding-bottom: 10px;
-  overflow: hidden auto;
+  overflow: hidden scroll;
+}
+
+.box .type .screen.chat-screen .messages::-webkit-scrollbar {
+  background-color: transparent;
+  width: 13px;
+}
+
+.box .type .screen.chat-screen .messages::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.box .type .screen.chat-screen .messages::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.4);
+}
+
+.box .type .screen.chat-screen .messages::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .box .type .screen.chat-screen .messages .msg {
@@ -191,7 +210,7 @@
 }
 
 .box .type .screen.chat-screen .messages .msg.emisor {
-  margin: 10px 20px 0 auto;
+  margin: 10px 10px 0 auto;
 }
 
 .box .type .screen.chat-screen .messages .msg.receptor {
@@ -283,7 +302,7 @@
   color: #333;
 }
 
-.box .type .screen.chats .search .chat, .screen.buscar .search .users {
+.box .type .screen.chats .search .chat, .screen.user_find .search .users {
   cursor: pointer;
   align-items: center;
   display: flex;
@@ -292,11 +311,11 @@
   position: relative;
 }
 
-.box .type .screen.chats .search .chat:hover, .screen.buscar .search .users:hover {
+.box .type .screen.chats .search .chat:hover, .screen.user_find .search .users:hover {
   background-color: #eee;
 }
 
-.box .type .screen.chats .search .chat span, .screen.buscar .search .users span {
+.box .type .screen.chats .search .chat span, .screen.user_find .search .users span {
   flex-shrink: 0;
   margin-left: 10px;
   height: 70%;
@@ -305,7 +324,7 @@
   border-radius: 50%;
 }
 
-.box .type .screen.chats .search .chat div, .screen.buscar .search .users div {
+.box .type .screen.chats .search .chat div, .screen.user_find .search .users div {
   display: flex;
   flex-flow: column;
   justify-content: center;
@@ -314,7 +333,7 @@
   margin-left: 15px;
 }
 
-.box .type .screen.chats .search .chat div h2, .screen.buscar .search .users div h2 {
+.box .type .screen.chats .search .chat div h2, .screen.user_find .search .users div h2 {
   font-size: 1.18em;
   color: #333;
 }
@@ -363,7 +382,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 1.8em;
+  font-size: 2em;
   user-select: none;
   cursor: pointer;
   transition: 0.1s;
@@ -643,6 +662,10 @@
     left: 0;
     top: 0;
     transform: translateY(10vh);
+  }
+
+  .box .type.active {
+    top: 100%;
   }
 
   .body.active .box .type {

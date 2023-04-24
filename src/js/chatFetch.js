@@ -1,6 +1,6 @@
 "use strict";
 
-class Chat {
+class ChatFetch {
   constructor(){
     this.limit = "";
     this.chat = [];
@@ -16,28 +16,22 @@ class Chat {
     })}).then(res=>res.json())
         .then(res=>{
           if (!res.mensaje){
-            console.log(res);
-            res.map(async user=>{
-              if (user['time_limit']){
-                this.limit = setTimeout(()=>{
-                  fetch("./src/html/closed.html",{method:'GET'})
-                    .then(res=>res.text())
-                    .then(res=>document.body.innerHTML += res);
-                  loadCss("./src/styles/disabled.css");
-                },user['time_limit'] + "000");
-                return;
-              }
+            res['users'].map(async user=>{
               await this.chat.push({
                 name : user.name,
                 info : (user.info == "" || user.info == null ? "Friend" : user.info) 
               });
             });
+            this.limit = setTimeout(()=>{
+              fetch("./src/html/closed.html",{method:'GET'})
+                .then(res=>res.text())
+                .then(res=>document.body.innerHTML += res);
+              loadCss("./src/styles/disabled.css");
+            },res['time_limit'] + "000");
             this.chat.map(user=>{
-              chatConstructor(user.name, user.info);
+              chatMethods.chatConstructor(user.name, user.info);
             });
-          }
-        }).catch(err=>{
-          console.log(err);
+          } else mensaje("no", res.mensaje);
         });
   }
 
@@ -55,13 +49,13 @@ class Chat {
         });
   }
 
-  getCurrentChat(nombre){
+  getCurrentChat(name){
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
       "request":"getCurrentChat",
-      "body":nombre
+      "body":name
     })}).then(res=>res.json())
         .then(res=>{
-          getChat(res,nombre);
+          chatMethods.getChat(res,name);
         });
   }
 
@@ -76,7 +70,6 @@ class Chat {
     fetch('./mvc/controllers/listener.php')
       .then(res=>res.json())
       .then(async res=>{
-        console.log(res);
         if (res.status == "changed"){
           this.chat.map(user=>{
             this.lastMessage(user.name);
@@ -87,32 +80,32 @@ class Chat {
       });
   }
 
-  lastMessage(usuario){
-    let encounterIndex = this.chat.filter(arr=> arr.name == usuario);
-    let user = this.chat.indexOf(encounterIndex[0]);
+  lastMessage(user){
+    let findIndex = this.chat.filter(arr=> arr.name == user);
+    let userIndex = this.chat.indexOf(findIndex[0]);
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
     "request":"getLastMessage",
-    "body":usuario
+    "body":user
     })}).then(res=>res.json())
         .then(async res=>{
-            if (this.chat[user].info.date != res.date){
-              this.chat[user].info = res;
-              if (document.querySelector('.user').textContent == usuario) {
-                document.getElementById(usuario).nextElementSibling.textContent = (res.emisor != usuario ? "Tú: " : "") + res.content;
-                chatField.appendChild(writeMessages(res, res.emisor == usuario ? 'receptor' : 'emisor'));
+            if (!this.chat[userIndex] || this.chat[userIndex].info.date != res.date){
+              this.chat[userIndex].info = res;
+              if (document.querySelector('.user').textContent == user) {
+                document.getElementById(user).nextElementSibling.textContent = (res.emisor != user ? "Tú: " : "") + res.content;
+                chatField.appendChild(chatMethods.writeMessages(res, res.emisor == user ? 'receptor' : 'emisor'));
                 chatField.scrollTop = chatField.scrollHeight;
               }
             }
-        }).catch();
+        });
   }
 
-  rejectFriend(nombre){
+  rejectFriend(name){
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({
       "request":"rejectFriend",
-      "body":nombre
+      "body":name
     })});
     body.classList.remove('active');
   }
 }
 
-let chats = new Chat();
+let chatFetch = new ChatFetch();

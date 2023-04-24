@@ -58,7 +58,7 @@
 
       $json;
       for($i=0;$i<count($result3);$i++){
-        $json[$result3[$i]] = $AskIdAndResponses[1][$i];
+        $json[$result2[$result3[$i]]] = $AskIdAndResponses[1][$i];
       } 
 
       return $json;

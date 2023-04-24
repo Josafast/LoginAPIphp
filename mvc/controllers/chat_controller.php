@@ -8,7 +8,7 @@
 
     if (array_key_exists('request',$jsonData)){
       $functionName = $jsonData['request'];
-      $chatAction = $chatObject->$functionName($jsonData['body']);
+      $chatAction = $chatObject->$functionName(array_key_exists('body',$jsonData) ? $jsonData['body'] : null);
       echo json_encode($chatAction);
     }
   } catch (Exception $e){

@@ -1,7 +1,5 @@
 <?php
 
-  error_reporting(E_ERROR | E_PARSE);
-
   require('conect.php');
 
   class Login extends Conexion {

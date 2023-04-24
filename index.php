@@ -8,9 +8,9 @@
 	<link rel="stylesheet" href="src/styles/normalize.css">
 	<link rel="stylesheet" href="src/styles/style.css">
 	<title>Sign up or Log in</title>
+	<?php $dir = __DIR__;?>
 </head>
 <body class="body">
-
 	<span class="help">
 		<img src="img/help.svg" alt="help">
 	</span>
@@ -123,19 +123,7 @@
 	</div>	
 	<script src="src/js/main.js"></script>
 	<?php else: require_once('mvc/views/inside.php'); endif;?>
-	<footer class="footer">
-  	<span class="close">
-    	<img src="img/close.svg" alt="close">
-  	</span>
-  	<a href="https://github.com/Josafast" target="_blank">
-    	<img src="img/jfastSFX.svg" alt="Josafast logo">
-  	</a>
-  	<p>Todos los derechos reservados para "Ionic" y el uso de sus iconos "Ion-icons" &#169; <b class="year"></b></p>
-  	<br><br><br><br>
-  	<a href="https://github.com/Josafast?tab=repositories" target="_blank">
-    	<img src="img/logo-github.svg" alt="logo github">
-  	</a>
-	</footer>
+	<?php require_once('src/html/footer.php')?>
 
 	<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 	<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

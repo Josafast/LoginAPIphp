@@ -1,3 +1,5 @@
+"use strict";
+
 const mensaje = (clase,msg)=>{
 	let mssg = document.querySelector(".message");
 	mssg.innerHTML = "";

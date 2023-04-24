@@ -1,0 +1,86 @@
+body {
+  background: #fff;
+  flex-direction: column;
+  justify-content: space-around;
+  padding-bottom: 120px;
+}
+
+.help {
+  filter: invert(63%) sepia(76%) saturate(5533%) hue-rotate(178deg) brightness(105%) contrast(102%);
+}
+
+.footer p {
+  color: var(--clr);
+}
+
+.footer img {
+  filter: invert(42%) sepia(59%) saturate(4864%) hue-rotate(5deg) brightness(107%) contrast(104%);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.formulario h2 {
+  align-self: start;
+  margin: 10px 0 10px -40px;
+}
+
+.formulario input[type="text"], input[type="password"]{
+  position: relative;
+  padding: 10px 13px;
+  border: 2px solid #bfbfbf;
+  color: gray;
+  margin: 7px 0;
+  outline: none;
+}
+
+.formulario input[type="submit"]{
+  margin-top: 20px;
+  color: #fff;
+  outline: none;
+  border: none;
+  width: 120px;
+  height: 41px;
+  background-color: var(--clr);
+  cursor: pointer;
+}
+
+.message {
+  background-color: var(--clr);
+  color: #fff;
+}
+
+.back {
+  font-size: 1.6em;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: var(--clr);
+}
+
+@media screen and (max-width:580px){
+  body {
+    justify-content: center;
+    padding-bottom: 60px;
+  }
+
+  h1 {
+    margin: 40px 0;
+    font-size: 1.7em;
+  }
+} 
+
+@media screen and (max-width: 350px) {
+  h1 {
+    font-size: 1.3em;
+  }
+  
+  .formulario h2 {
+    margin-left: 10px;
+    font-size: 1.3em;
+  } 
+}

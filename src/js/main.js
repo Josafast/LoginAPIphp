@@ -30,7 +30,7 @@ window.addEventListener('load',()=>{
 	document.querySelector('.recuperar').addEventListener('click',(e)=>{
 		e.preventDefault();
 		if (document.getElementById('login-email').value != ''){
-			history.pushState({email:document.getElementById('login-email').value},'','mvc/views/recuperar-password.php');
+			history.replaceState({email:document.getElementById('login-email').value},'','mvc/views/recovery.php');
 			history.go(0);
 		} else mensaje("no","Debe completar el campo del email para recuperar su contraseña");
 	})
@@ -53,6 +53,8 @@ window.addEventListener('load',()=>{
 					'El campo del correo está vacío' :
 				!forme_one.get('sign-password') ?
 					'El campo de la contraseña está vacío' :
+				forme_one.get('sign-password').length < 6 ?
+					'La contraseña debe tener como mínimo 6 caracteres' :
 				!forme_one.get('sign-password-confirm') ? 
 					'El campo de confirmación debe llenarse obligatoriamente' : 
 				forme_one.get('sign-password') != forme_one.get('sign-password-confirm') ? 

@@ -1,137 +1,16 @@
 "use strict";
 
 let body = document.querySelector('.body');
+let mainSquare = document.querySelector('.type');
+let menuButton = document.querySelector('.menu-button');
+let neighborProfile = document.querySelector('.other-profile')
+let solicitudeButton = document.querySelector('.solicitud');
+let rejectButton = document.querySelector('.reject_friend');
 let chatField = document.querySelector('.messages');
-
-function chatConstructor(nombre, data){
-  if (data != "not"){
-    let chat = document.createElement('div');
-    chat.classList.add('chat');
-      
-    let image = document.createElement('span');
-
-    let name = document.createElement('h2');
-    name.textContent = nombre;
-    name.id = nombre;
-    let chatInfo = document.createElement('h3');
-
-    if (data == "Accept" || data == "Friend" || data.length == 0){
-      chatInfo.classList.add('bold');
-      chatInfo.textContent = data == "Accept" ? "Te ha enviado una solicitud de amistad" : data == "Friend" ? "¡Salúdalo!" : "¡Escribe el primer mensaje!";
-    } else if (data['not-any']) {
-      chatInfo.textContent = "¡Salúdalo!";
-    } else chatInfo.textContent = data.emisor != nombre ? 'Tu: ' + data.content : data.content;
-
-    let info = document.createElement('div');
-    info.appendChild(name);
-    info.appendChild(chatInfo);
-
-    chat.appendChild(image);
-    chat.appendChild(info);
-
-    document.querySelector('.search').appendChild(chat);
-    
-    chat.addEventListener('click',()=>{
-      if (data == 'Accept'){
-        document.querySelector('.other-profile').children[1].textContent = nombre;
-        document.querySelector('.buscar').classList.remove('active');
-        document.querySelector('.other-profile').classList.add('active');
-        document.querySelector('.solicitud').textContent = "Aceptar solicitud";
-        document.querySelector('.solicitud').classList.remove('disabled');
-        return
-      }
-      chats.getCurrentChat(nombre);
-
-      body.classList.add('active');
-      document.getElementById(nombre).nextElementSibling.classList.remove('bold');
-
-      document.querySelector('.back-chat').addEventListener('click',()=>{
-        body.classList.remove('active')
-      });
-
-      document.querySelector('.otherUser').textContent = nombre;
-      document.querySelector('.user').textContent = nombre;
-
-      document.querySelector('.send').previousElementSibling.addEventListener('keyup',(e)=>{
-        if (e.code == 'Enter' && document.querySelector('.send').previousElementSibling.value != ''){
-          sendMessage(e.target, nombre);
-        }
-      });
-
-      document.querySelector('.user').addEventListener('click',()=>{
-        document.querySelector('.type').style.top = "100%";
-      });
-
-      document.querySelector('.send').addEventListener('click',(e)=>{
-        if (document.querySelector('.send').previousElementSibling.value != ''){
-          sendMessage(e.target.parentElement.previousElementSibling, nombre);
-        }
-      });
-
-      document.querySelector('.reject_friend').addEventListener('click',()=>chats.rejectFriend(nombre));
-    })
-  } 
-}
-
-function sendMessage(input, nombre){
-  if (input.value == ""){
-    return mensaje("no","No puedes enviar un mensaje vacío");
-  }
-
-  if (document.querySelector('.not-any')){
-    chatField.removeChild(document.querySelector('.not-any'));
-  }
-
-  let actual = Date.now();
-
-  let object =
-    {
-      "receptor":nombre,
-      "content":input.value,
-      "date":actual
-    };
-
-  chats.sendMessage(object);
-  input.value = "";
-}
-
-function writeMessages(msj, mode){
-  let date = new Date(msj.date);
-  let msg = document.createElement('span');
-  msg.classList.add('msg');
-  msg.classList.add(mode);
-  let messageContent = document.createElement('p');
-  let messageTime = document.createElement('b');
-  messageContent.textContent = msj.content;
-  messageTime.textContent = `Hora: ${date.getHours()}:${date.getMinutes() < 10 ? '0' : ''}${date.getMinutes()}`;
-  msg.appendChild(messageContent);
-  msg.appendChild(messageTime);
-
-  return msg;
-}
-
-function getChat(messages, nombre){
-  chatField.innerHTML = "";
-  if (messages.message){
-    let noAny = document.createElement('span');
-    noAny.classList.add('floatMsg');
-    noAny.classList.add('not-any');
-    noAny.textContent = messages.message;
-    chatField.appendChild(noAny);
-    return;
-  }
-  let fragment = document.createDocumentFragment();
-  messages.map(msg=>{
-    let msj = writeMessages(msg, msg.emisor == nombre ? 'receptor' : 'emisor');
-    fragment.appendChild(msj);
-  });
-  chatField.appendChild(fragment);
-  chatField.scrollTop = chatField.scrollHeight;
-}
+let sendMessageButton = document.querySelector('.send');
 
 fetch('./mvc/controllers/loged_controller.php?userInfo=true',{method:'get'})
-  .then(res=>res.json())
-  .then(res=>{
+  .then(res=>res.json()).then(res=>{
     document.querySelector('.emailPHP').textContent = res.login_email;
     document.querySelectorAll(".nombrePHP").forEach(element=>{
       element.textContent = res.login_user;
@@ -149,63 +28,58 @@ window.addEventListener("load",async ()=>{
       e.preventDefault();
   
       fetch('./mvc/controllers/loged_controller.php?back=true',{method:"GET"})
-        .then(res=>res.json())
-        .then(res=>{
-          console.log(res);
-          if (res.mode == "ok"){
-            location.reload();
-          }
+        .then(res=>res.json()).then(res=>{
+          if (res.mode == "ok") location.reload();
         })
     });
   });
 
-  document.querySelector('.menu-button').addEventListener('click',(e)=>{
-    let menu = document.querySelector('.menu-button');
-    let menuButton = menu.children[0];
-    let backButton = menu.children[1];
-    [menuButton.style.display,backButton.style.display] = [backButton.style.display,menuButton.style.display];
-    if (!menu.classList.contains('active')){
-      document.querySelector('.type').style.top = "100%";
+  menuButton.addEventListener('click',(e)=>{
+    let showButton = menuButton.children[0];
+    let backButton = menuButton.children[1];
+    [showButton.style.display,backButton.style.display] = [backButton.style.display,showButton.style.display];
+    if (!menuButton.classList.contains('active')){
+      mainSquare.classList.add('active')
     } else {
-      document.querySelector('.type').removeAttribute('style');
+      mainSquare.classList.remove('active');
     }
-    menu.classList.toggle('active');
+    menuButton.classList.toggle('active');
   });
 
   document.querySelector('.back-profile').addEventListener('click',()=>{
-    document.querySelector('.type').removeAttribute('style');
+    mainSquare.classList.remove('active');
   });
 
-  document.querySelectorAll('.menu-option').forEach(element=>{
-    element.addEventListener("click",(e)=>{
-      document.querySelectorAll('.screen').forEach(scrEEn=>{
-        let chat = document.querySelectorAll(".screen")[1];
+  document.querySelectorAll('.menu-option').forEach(menuOption=>{
+    menuOption.addEventListener("click",e=>{
+      let screens = document.querySelectorAll('.screen');
+      let chat = document.querySelectorAll(".screen")[1];
+      screens.forEach(element=>element.classList.remove('active'));
+      screens.forEach(scrEEn=>{
         if (scrEEn.classList.contains(e.target.id)) scrEEn.classList.add('active');  
-        else scrEEn.classList.remove('active');
-
-        if (e.target.id != "chats") chat.setAttribute("style","opacity:0");
-        else chat.removeAttribute("style");
-
-        document.querySelector('.type').removeAttribute('style');
+        mainSquare.classList.remove('active');
       });
-      let menu = document.querySelector('.menu-button');
-      let menuButton = menu.children[0];
-      let backButton = menu.children[1];
-      [menuButton.style.display,backButton.style.display] = [backButton.style.display,menuButton.style.display];
-      menu.classList.remove('active');
+      let showButton = menuButton.children[0];
+      let backButton = menuButton.children[1];
+      [showButton.style.display,backButton.style.display] = [backButton.style.display,showButton.style.display];
+      menuButton.classList.remove('active');
     });
   });
 
-  document.querySelector('.solicitud').addEventListener('click',(e)=>{
+  solicitudeButton.addEventListener('click',(e)=>{
     fetch('./mvc/controllers/chat_controller.php',{method:'POST',body:JSON.stringify({"request":(e.target.textContent == "Enviar solicitud" ? "sendSolicitude" : "acceptSolicitude"),"body":e.target.previousElementSibling.textContent})});
-    document.querySelector('.solicitud').classList.add('disabled');
-    document.querySelector('.other-profile').classList.remove('active');
+    solicitudeButton.classList.add('disabled');
+    neighborProfile.classList.remove('active');
   });
 
   document.querySelector('.user_search').addEventListener('input',(e)=>{
-    fetch(`./mvc/controllers/loged_controller.php?search_user=${e.target.value.trim()}`,{method:"POST"})
-      .then(res=>res.json())
-      .then(res=>{
+    fetch(`./mvc/controllers/chat_controller.php`,
+      {method:"POST",
+      body: JSON.stringify({
+        'request': 'searchUsers',
+        'body': e.target.value.trim()
+      })})
+      .then(res=>res.json()).then(res=>{
         document.querySelectorAll('.search')[1].innerHTML = "";
         if (res.usuarios != ""){
           for (let i=0; i < res.usuarios.length;i++){
@@ -220,11 +94,11 @@ window.addEventListener("load",async ()=>{
               div[0].appendChild(div[1]);
 
               div[0].addEventListener('click',()=>{
-                document.querySelector('.other-profile').children[1].textContent = res.usuarios[i]['login_user'];
-                document.querySelector('.buscar').classList.remove('active');
-                document.querySelector('.other-profile').classList.add('active');
-                document.querySelector('.solicitud').textContent = "Enviar solicitud";
-                document.querySelector('.solicitud').classList.remove('disabled');
+                neighborProfile.children[1].textContent = res.usuarios[i]['login_user'];
+                document.querySelector('.user_find').classList.remove('active');
+                neighborProfile.classList.add('active');
+                solicitudeButton.textContent = "Enviar solicitud";
+                solicitudeButton.classList.remove('disabled');
               });
 
               document.querySelectorAll('.search')[1].appendChild(div[0]);
@@ -253,6 +127,7 @@ window.addEventListener("load",async ()=>{
         forme_one.get('old-password') == "" ? "Escribir la contraseña antigua es obligatoria" :
         forme_one.get('new-password') == "" ? "Si quieres una nueva contraseña debes escribirla" :
         forme_one.get('new-password-confirm') == "" ? "Debes confirmar tu contraseña para continuar" :
+        forme_one.get('new-password').length < 6 ? "La contraseña debe tener como mínimo 6 caracteres" :
         forme_one.get('new-password') != forme_one.get('new-password-confirm') ? "Las contraseñas son diferentes" : ""
       ) : e.target.classList.contains('remove-account-form') ? (
         forme_one.get('password') == "" || forme_one.get('confirm-password') == "" ? "Los campos no pueden quedar en blanco" :

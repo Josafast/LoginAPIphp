@@ -1,6 +1,5 @@
 <?php
 
-  error_reporting(E_ERROR | E_PARSE);
   require_once '..\..\vendor\autoload.php';
   use Firebase\JWT\JWT;
   use Firebase\JWT\Key;
@@ -23,16 +22,16 @@
 
     public function cookieOk():array{
       $ckokay = $this->dbconex->query("SELECT id FROM login_users WHERE login_token='" . $_COOKIE['user'] . "'",PDO::FETCH_ASSOC);
-      $user;
+      $user = null;
       foreach($ckokay as $value){
         $user = $value;
       }
 
-      if ($user == null){
+      if (!$user){
         setcookie('user',"",time()-1,"/");
       }
 
-      return array("status"=>($user == null ? "wrong" : "ok"));
+      return array("status"=>(!$user ? "wrong" : "ok"));
     }
 
     public function updatePassword(array $values):array{
@@ -50,10 +49,15 @@
       $user = self::selectUser();
 
       if (password_verify($password,$user['login_password'])){
-        $query = $this->dbconex->exec("DELETE FROM login_users WHERE login_email='" . $user['login_email'] . "'");
-        $query2 = $this->dbconex->exec("DELETE FROM login_chat WHERE login_user='" . $user['login_user'] . "'");
+        $query = $this->dbconex->exec("DELETE FROM login_users WHERE id='" . $user['id'] . "'");
+        $query2 = $this->dbconex->exec("DELETE FROM login_chat WHERE id='" . $user['id'] . "'");
+        $query3 = $this->dbconex->prepare("UPDATE login_chat 
+          SET login_friend=login_friend-:deletedUser,
+              login_messages=login_messages-:deletedUser,
+              login_last_message=login_last_message-:deletedUser");
+        $query3->execute(array(":deletedUser"=>$user['login_user']));
 
-        if ($query == 1 && $query2 == 1){
+        if ($query == 1 && $query2 == 1 && $query3->rowCount() >= 1){
           setcookie('user',"",time()-1,"/");
           return array("mode"=>"removed","mensaje"=>"Se ha borrado la cuenta");
         } else return array("mode"=>"no","mensaje"=>"No se ha podido borrar la cuenta");
@@ -71,24 +75,6 @@
       } else {
         return array("mode"=>"no","mensaje"=>"No se ha podido actualizar las preguntas de seguridad");
       }
-    }
-
-    public function search_users(string $searchUser):array{
-      $user = self::selectUser();
-      $query = $this->dbconex->query("SELECT f.login_user, l.login_friend FROM login_users f INNER JOIN login_chat l ON 
-        (f.login_user = l.login_user) AND 
-      (LOWER(f.login_user) LIKE LOWER('" . $searchUser . "%')) AND 
-        (f.login_email<>'" . $user['login_email'] . "')"
-      ,PDO::FETCH_ASSOC);
-      
-      $users;
-      foreach($query as $value){
-        if (!array_key_exists($user['login_user'],json_decode($value['login_friend'], true))){
-          $users[] = $value;
-        }
-      }
-
-      return array("usuarios"=>$users == null || $searchUser == "" ? "" : $users);
     }
   }
 
