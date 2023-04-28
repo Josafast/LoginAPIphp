@@ -1,14 +1,12 @@
 <?php
-  require_once '..\..\vendor\autoload.php';
-  $dotenv = Dotenv\Dotenv::createImmutable('../../');
-  $dotenv->load();
+  require_once __DIR__.'/../../vendor/autoload.php';
   use Firebase\JWT\JWT;
   use Firebase\JWT\Key;
   
   $dbconex;
 
   try {
-    $dbconex = new PDO("pgsql:host=" . $_ENV['DDBB_HOST'] . ";port=" . $_ENV['DDBB_PORT'] . ";dbname=" . $_ENV['DDBB_NAME'],$_ENV['DDBB_USER'],$_ENV['DDBB_PASSWORD']);
+    $dbconex = new PDO("pgsql:host=" . $_ENV['POSTGRES_HOST'] . ";port=" . $_ENV['POSTGRES_PORT'] . ";dbname=" . $_ENV['POSTGRES_DB'],$_ENV['POSTGRES_USER'],$_ENV['POSTGRES_PASSWORD']);
     $dbconex->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
     $dbconex->setAttribute(PDO::ATTR_PERSISTENT, true);
   } catch (Exception $e){
