@@ -13,7 +13,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Copiar los archivos de la aplicación al contenedor
 RUN git config --global --add safe.directory /var/www/html
-RUN git clone https://github.com/Josafast/LoginAPIphp.git /var/www/html/ && git checkout 49f6222
+RUN git clone https://github.com/Josafast/LoginAPIphp.git /var/www/html/ && git checkout 5e7177a
 
 # Instalar dependencias de la aplicación mediante composer
 RUN echo '{"require": {"firebase/php-jwt": "^5.3", "slim/slim": "^3.12"}}' > /var/www/html/composer.json \
