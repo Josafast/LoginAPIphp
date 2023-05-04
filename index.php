@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="height=device-height, initial-scale=1">
 	<meta http-equiv="x-ua-compatible" content="ie-edge">
 	<link rel="shortcut icon" type="image/icon" href="img/favicon.ico">
 	<link rel="stylesheet" href="src/styles/normalize.css">
